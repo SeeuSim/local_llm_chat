@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-const MODE_KEY = 'darkMode';
 const MEDIA_QUERY = '(prefers-color-scheme: dark)';
+const MODE_KEY = 'darkMode';
 
 export const useDarkMode = () => {
+  // For toggle UI element props only
   const [darkModePreference, _setDarkModePreference] = useState('system');
 
   const setDarkModePreference = (newDarkModePreference: string) => {
@@ -26,22 +27,18 @@ export const useDarkMode = () => {
 
   useEffect(() => {
     const darkModePreference = localStorage.getItem(MODE_KEY);
-    if (darkModePreference === null || darkModePreference === 'system') {
-      setDarkModePreference('system');
-      if (window) {
-        const callback = (event: MediaQueryListEvent) => {
-          if (event.matches) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        };
-        window.matchMedia(MEDIA_QUERY).addEventListener('change', callback);
+    setDarkModePreference(darkModePreference === null ? 'system' : darkModePreference);
+    if (window) {
+      const callback = (event: MediaQueryListEvent) => {
+        if (event.matches && darkModePreference === 'system') {
+          document.documentElement.classList.add('dark');
+        } else if (!event.matches && darkModePreference === 'system') {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+      window.matchMedia(MEDIA_QUERY).addEventListener('change', callback);
 
-        return () => window.matchMedia(MEDIA_QUERY).removeEventListener('change', callback);
-      }
-    } else {
-      setDarkModePreference(darkModePreference);
+      return () => window.matchMedia(MEDIA_QUERY).removeEventListener('change', callback);
     }
   }, []);
 
