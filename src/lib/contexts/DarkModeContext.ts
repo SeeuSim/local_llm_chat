@@ -3,9 +3,9 @@
 import { createContext } from 'react';
 
 interface IDarkModeContextState {
-	darkMode: string;
+  darkMode: string;
 }
 
 export const DarkModeContext = createContext<IDarkModeContextState>({
-	darkMode: 'dark',
+  darkMode: 'dark',
 });

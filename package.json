@@ -7,7 +7,8 @@
     "build": "env-cmd -f .env.dev next build",
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "fmt": "prettier --config ./.prettierrc \"**/*.{ts,tsx,js}\" --write"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
