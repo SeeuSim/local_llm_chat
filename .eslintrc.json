@@ -1,0 +1,70 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:tailwindcss/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["import", "unused-imports", "react", "@typescript-eslint", "tailwindcss"],
+  "rules": {
+    // "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"]
+      }
+    ],
+    "@typescript-eslint/explicit-member-accessibility": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-unused-vars": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    // Basic
+    "array-callback-return": "warn",
+    "no-console": "warn",
+    "no-prototype-builtins": 0,
+    // "no-expected-multiline": "warn", // can't find rule definition
+
+    // React
+    "react/display-name": 0,
+    "react/no-unescaped-entities": ["error", { "forbid": [">", "}", "\""] }],
+    "react/no-unknown-property": "off",
+    "react/self-closing-comp": [
+      "error",
+      {
+        "component": true,
+        "html": true
+      }
+    ],
+    "react-hooks/rules-of-hooks": "off",
+    "tailwindcss/enforces-negative-arbitrary-values": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "ignorePatterns": ["**/*.js"],
+  "overrides": [
+    {
+      "files": ["**/*.tsx"],
+      "rules": {
+        "react/prop-types": "off"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+docker build . --build-arg ENV=dev
