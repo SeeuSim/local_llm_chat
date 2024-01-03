@@ -36,7 +36,7 @@ export default function Home() {
         <span className='text-7xl'>Test Text</span>
         <span className='text-7xl'>Test Text</span>
         <span className='text-7xl'>Test Text</span>
-        <span className='text-7xl'>Test Text</span>
+        <span className='text-7xl'>Bottom Row</span>
       </div>
     </ChatLayout>
   );
