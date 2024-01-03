@@ -1,6 +1,6 @@
 git add .
 
-if [ "$1" -eq 0 ]; then
+if [ -z "$1" ]; then
   git commit -as
 else
   git commit -asm "$1"
