@@ -22,7 +22,7 @@ export const SideNavContent = () => {
         <Pencil2Icon />
       </Button>
       <div className='flex flex-1 text-clip rounded-r-md'>
-        <div className='flex max-h-[calc(100vh-160px)] w-full overflow-y-auto scrollbar-thin scrollbar-track-inherit dark:scrollbar-thumb-neutral-700'>
+        <div className='flex max-h-[calc(100vh-160px)] w-full overflow-y-auto scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border'>
           <div className='flex w-full flex-col gap-2'>
             {generateObjectsArray()
               // .sort((a, b) => a.lastModified.getTime() - b.lastModified.getTime())

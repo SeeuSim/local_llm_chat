@@ -11,7 +11,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
       <SideNav />
       <div
         id='main-container'
-        className='h-[calc(100vh-92px)] overflow-y-auto overscroll-none bg-secondary sm:ml-40'
+        className='h-[calc(100vh-92px)] overflow-y-auto overscroll-none bg-secondary scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border sm:ml-40'
       >
         <div id='main-container-top-padding' className='h-[62px] w-full bg-primary-foreground' />
         <div className='p-4'>{children}</div>

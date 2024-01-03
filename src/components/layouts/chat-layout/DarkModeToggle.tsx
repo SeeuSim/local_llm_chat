@@ -15,7 +15,7 @@ const DarkModeToggle = () => {
     <Select value={darkModePreference ?? 'dark'} onValueChange={setDarkModePreference}>
       <SelectTrigger
         className={cn(
-          'ml-auto w-32 whitespace-nowrap rounded border border-border px-2 py-1',
+          'ml-auto w-32 whitespace-nowrap rounded border border-border bg-primary-foreground px-2 py-1',
           'shadow-none hover:bg-neutral-200/70 dark:hover:bg-neutral-800'
         )}
       >
