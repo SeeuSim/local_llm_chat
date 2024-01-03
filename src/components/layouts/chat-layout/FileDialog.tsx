@@ -49,9 +49,9 @@ export const FileDialog = () => {
           }}
           className={cn(
             'w-[calc(26*4px)] bg-border pl-0.5 pt-1.5 text-sm',
-            'file:rounded-md file:bg-neutral-300 file:font-medium file:text-primary-foreground',
+            'file:rounded-md file:bg-primary file:font-medium file:text-primary-foreground',
             'file:mb-3 file:ml-0.5 file:mr-4 file:placeholder:text-primary',
-            'file:hover:cursor-pointer file:hover:bg-neutral-200'
+            'ease-in-out file:hover:scale-105 file:hover:cursor-pointer file:hover:bg-neutral-200'
           )}
         />
         <div className='flex flex-wrap gap-2'>
