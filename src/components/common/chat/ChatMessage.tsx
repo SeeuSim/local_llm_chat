@@ -11,12 +11,24 @@ interface IChatMessageProps {
 
 export const ChatMessage = ({ role, content }: IChatMessageProps) => {
   return (
-    <div className={cn('flex flex-row gap-4', role === 'user' && 'flex-row-reverse')}>
-      <div className={cn('mb-auto mt-2 flex flex-col items-center gap-2')}>
-        {role === 'system' ? <FaceIcon /> : <PersonIcon />}
+    <div className={cn('flex flex-col')}>
+      <div className={cn('mb-1 flex flex-row items-center gap-2')}>
+        <div
+          className={cn(
+            'rounded-md border border-border bg-primary-foreground p-2 text-primary',
+            role === 'system' && 'bg-secondary text-secondary-foreground'
+          )}
+        >
+          {role === 'system' ? <FaceIcon /> : <PersonIcon />}
+        </div>
         <span className='text-sm font-bold'>{role === 'system' ? 'Model' : 'You'}</span>
       </div>
-      <Card className='flex w-full bg-card text-card-foreground'>
+      <Card
+        className={cn(
+          'ml-5 flex w-full bg-card text-card-foreground',
+          role === 'system' && 'bg-neutral-200 dark:bg-neutral-700'
+        )}
+      >
         <CardContent className='flex flex-col gap-2 px-3 py-2'>
           <span className={cn('prose prose-neutral text-sm')}>
             {role === 'user'

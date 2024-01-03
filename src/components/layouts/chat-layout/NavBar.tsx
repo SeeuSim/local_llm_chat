@@ -6,9 +6,9 @@ import { Logo } from './Logo';
 
 export const NavBar = () => {
   return (
-    <nav
+    <header
       className={cn(
-        'fixed right-0 top-0 flex w-screen border-b border-b-border backdrop-blur-lg sm:w-[calc(100vw-160px)]'
+        'sticky top-0 z-50 ml-auto flex w-screen border-b border-b-border backdrop-blur-lg sm:w-[calc(100vw-160px)] md:w-[calc(100vw-192px)]'
       )}
     >
       <div className='inline-flex w-full items-center justify-between p-3'>
@@ -18,6 +18,6 @@ export const NavBar = () => {
         </div>
         <DarkModeToggle />
       </div>
-    </nav>
+    </header>
   );
 };

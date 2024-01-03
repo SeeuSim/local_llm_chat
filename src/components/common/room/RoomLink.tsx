@@ -1,6 +1,6 @@
 import { DotsVerticalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,9 @@ interface IRoomLinkProps {
 
 export const RoomLink = ({ summary }: IRoomLinkProps) => {
   return (
-    <Button
-      variant='link'
+    <div
       className={cn(
+        buttonVariants({ variant: 'link' }),
         'inline-flex justify-between rounded-md px-2 py-1.5 hover:no-underline',
         'hover:bg-secondary'
       )}
@@ -41,6 +41,6 @@ export const RoomLink = ({ summary }: IRoomLinkProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </Button>
+    </div>
   );
 };

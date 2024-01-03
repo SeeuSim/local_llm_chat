@@ -3,8 +3,9 @@
 import { Pencil2Icon } from '@radix-ui/react-icons';
 
 import { RoomLink } from '@/components/common/room/RoomLink';
-import { generateObjectsArray } from '@/components/common/room/temp-utils';
+import { getRooms } from '@/components/common/room/temp-utils';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 export const SideNavContent = () => {
@@ -21,17 +22,15 @@ export const SideNavContent = () => {
         <span>New&nbsp;chat</span>
         <Pencil2Icon />
       </Button>
-      <div className='flex flex-1 text-clip rounded-r-md'>
-        <div className='flex max-h-[calc(100vh-160px)] w-full overflow-y-auto scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border'>
-          <div className='flex w-full flex-col gap-2'>
-            {generateObjectsArray()
-              // .sort((a, b) => a.lastModified.getTime() - b.lastModified.getTime())
-              .map((obj, index) => (
-                <RoomLink key={index} {...obj} />
-              ))}
-          </div>
+      <ScrollArea className='flex h-[calc(100vh-160px)] w-full rounded-md border-y border-border/40'>
+        <div className='flex flex-col gap-2'>
+          {getRooms()
+            // .sort((a, b) => a.lastModified.getTime() - b.lastModified.getTime())
+            .map((obj, index) => (
+              <RoomLink key={index} {...obj} />
+            ))}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };
