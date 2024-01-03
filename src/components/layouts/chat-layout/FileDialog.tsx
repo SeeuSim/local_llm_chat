@@ -48,10 +48,10 @@ export const FileDialog = () => {
             }
           }}
           className={cn(
-            'w-[calc(26*4px)] bg-border pl-0.5 pt-1.5 text-sm',
-            'file:rounded-md file:bg-primary file:font-medium file:text-primary-foreground',
-            'file:mb-3 file:ml-0.5 file:mr-4 file:placeholder:text-primary',
-            'ease-in-out file:hover:scale-105 file:hover:cursor-pointer file:hover:bg-neutral-200'
+            'my-2 h-[38px] w-[108px] bg-transparent p-0 focus:ring-0 focus:ring-offset-0',
+            'file:rounded-md file:bg-secondary file:font-medium file:text-secondary-foreground',
+            'file:mr-4 file:px-3 file:py-2 file:placeholder:text-primary',
+            'file:hover:cursor-pointer file:hover:bg-border'
           )}
         />
         <div className='flex flex-wrap gap-2'>
