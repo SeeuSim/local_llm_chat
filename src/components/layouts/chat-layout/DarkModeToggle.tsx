@@ -1,14 +1,8 @@
 'use client';
 
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { LaptopIcon, MobileIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useDarkMode } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
@@ -19,14 +13,14 @@ const DarkModeToggle = () => {
     <Select value={darkModePreference ?? 'dark'} onValueChange={setDarkModePreference}>
       <SelectTrigger
         className={cn(
-          'w-32 whitespace-nowrap rounded border border-border px-2 py-1',
+          'ml-auto w-32 whitespace-nowrap rounded border border-border px-2 py-1',
           'shadow-none hover:bg-neutral-200/70 dark:hover:bg-neutral-800'
         )}
       >
         <div className='inline-flex items-center gap-2'>
           <SunIcon className='flex h-4 w-4 dark:hidden' />
           <MoonIcon className='hidden h-4 w-4 dark:flex' />
-          <SelectValue className='' />
+          <span>{darkModePreference}</span>
         </div>
       </SelectTrigger>
       <SelectContent
@@ -35,16 +29,33 @@ const DarkModeToggle = () => {
           'shadow-none'
         )}
       >
-        {['dark', 'light', 'system'].map((value, _index) => (
+        {[
+          { label: 'dark', icon: <MoonIcon /> },
+
+          { label: 'light', icon: <SunIcon /> },
+
+          {
+            label: 'system',
+            icon: (
+              <>
+                <MobileIcon className='flex sm:hidden' />
+                <LaptopIcon className='hidden sm:flex' />
+              </>
+            ),
+          },
+        ].map((value) => (
           <SelectItem
-            value={value}
-            key={value}
+            value={value.label}
+            key={value.label}
             className={cn(
-              'flex flex-1 rounded bg-primary-foreground focus-visible:cursor-pointer',
+              'flex flex-1 items-center rounded bg-primary-foreground focus-visible:cursor-pointer',
               'focus-visible:bg-neutral-200/70 dark:focus-visible:bg-neutral-700'
             )}
           >
-            <span>{value}</span>
+            <div className='inline-flex items-center gap-2'>
+              {value.icon}
+              <span>{value.label}</span>
+            </div>
           </SelectItem>
         ))}
       </SelectContent>
