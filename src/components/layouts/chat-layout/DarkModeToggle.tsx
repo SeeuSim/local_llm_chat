@@ -1,10 +1,12 @@
 'use client';
 
-import { LaptopIcon, MobileIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useDarkMode } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
+
+import { DARK_MODE_OPTIONS } from './dark-mode/constants';
 
 const DarkModeToggle = () => {
   const { darkModePreference, setDarkModePreference } = useDarkMode();
@@ -29,21 +31,7 @@ const DarkModeToggle = () => {
           'shadow-none'
         )}
       >
-        {[
-          { label: 'dark', icon: <MoonIcon /> },
-
-          { label: 'light', icon: <SunIcon /> },
-
-          {
-            label: 'system',
-            icon: (
-              <>
-                <MobileIcon className='flex sm:hidden' />
-                <LaptopIcon className='hidden sm:flex' />
-              </>
-            ),
-          },
-        ].map((value) => (
+        {DARK_MODE_OPTIONS.map((value) => (
           <SelectItem
             value={value.label}
             key={value.label}

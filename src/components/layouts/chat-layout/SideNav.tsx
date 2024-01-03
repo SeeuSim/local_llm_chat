@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
+import { SideNavContent } from './SideNavContent';
 
 export const SideNav = () => {
   return (
@@ -13,6 +14,7 @@ export const SideNav = () => {
       <div className='relative flex flex-col gap-4 p-4'>
         <Logo />
         <hr className='border border-border' />
+        <SideNavContent />
       </div>
     </aside>
   );

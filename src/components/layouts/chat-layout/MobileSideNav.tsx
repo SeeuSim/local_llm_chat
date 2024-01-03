@@ -1,5 +1,6 @@
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { HamburgerMenuIcon, PinLeftIcon } from '@radix-ui/react-icons';
+import { SideNavContent } from './SideNavContent';
 
 export const MobileSideNav = () => {
   return (
@@ -15,6 +16,7 @@ export const MobileSideNav = () => {
           <h1 className='ml-auto text-xl font-bold'>LocaLLM</h1>
         </div>
         <hr className='border border-border' />
+        <SideNavContent />
       </SheetContent>
     </Sheet>
   );
