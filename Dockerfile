@@ -9,17 +9,15 @@ RUN yarn global add pnpm
 FROM depsbuild as deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install
+RUN pnpm i --frozen-lockfile
 
 FROM depsbuild as builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
 RUN pnpm build
 # ARG ENV
 # RUN pnpm build:$ENV
-
 RUN pnpm next telemetry disable
 
 FROM base as runner
