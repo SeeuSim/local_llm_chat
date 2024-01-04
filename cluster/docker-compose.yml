@@ -1,0 +1,20 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
+    image: "llmchat-db"
+    container_name: "llmchat_db"
+    environment:
+      POSTGRES_DB: "llmchat"
+      POSTGRES_USER: "locallm"
+      POSTGRES_PASSWORD: "locallm"
+      PGDATA: "/data/llmchat-db"
+    volumes:
+       - "llmchat-db-docker:/data/llmchat-db"
+    ports:
+      - "5431:5432"
+    restart: unless-stopped
+volumes:
+    llmchat-db-docker:
+      external: true

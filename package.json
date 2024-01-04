@@ -8,7 +8,9 @@
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",
     "prepare": "husky install",
-    "fmt": "prettier --config ./.prettierrc \"**/*.{ts,tsx,js}\" --write"
+    "fmt": "prettier --config ./.prettierrc \"**/*.{ts,tsx,js}\" --write",
+    "generate": "drizzle-kit generate:pg",
+    "migrate": "tsx src/lib/db/migrate.mts"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
@@ -26,11 +28,14 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "drizzle-orm": "^0.29.3",
     "env-cmd": "^10.1.0",
     "http-status-codes": "^2.3.0",
     "next": "14.0.4",
     "path": "^0.12.7",
+    "pg": "^8.11.3",
     "pino-pretty": "^10.3.1",
+    "postgres": "^3.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sharp": "^0.33.1",
@@ -40,10 +45,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
+    "@types/pg": "^8.10.9",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "autoprefixer": "^10.4.16",
+    "drizzle-kit": "^0.20.9",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.4",
     "eslint-config-prettier": "^9.1.0",
@@ -56,6 +63,7 @@
     "prettier": "^3.1.1",
     "prettier-plugin-tailwindcss": "^0.5.10",
     "tailwindcss": "^3.4.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
 }
