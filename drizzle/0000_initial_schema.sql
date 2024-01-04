@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS "embeddings" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"embedding" vector(1536),
+	"content" text,
+	"metadata" jsonb,
+	"embedding" vector(768),
 	CONSTRAINT "embeddings_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint

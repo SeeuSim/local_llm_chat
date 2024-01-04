@@ -1,5 +1,5 @@
 {
-  "id": "aa4247ff-75a1-4ae3-8e59-d0728e39ae2e",
+  "id": "e929d79a-7104-47c9-bc3b-9d5e26d42950",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -14,9 +14,21 @@
           "primaryKey": true,
           "notNull": true
         },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "embedding": {
           "name": "embedding",
-          "type": "vector(1536)",
+          "type": "vector(768)",
           "primaryKey": false,
           "notNull": false
         }

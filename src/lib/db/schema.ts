@@ -1,5 +1,5 @@
 import { customVector } from '@useverk/drizzle-pgvector';
-import { index, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const RoomTable = pgTable('room', {
   id: serial('id').unique().primaryKey(),
@@ -27,5 +27,7 @@ export const MessagesTable = pgTable(
 
 export const EmbeddingsTable = pgTable('embeddings', {
   id: serial('id').unique().primaryKey(),
-  embedding: customVector('embedding', { dimensions: 1536 }),
+  content: text('content'),
+  metadata: jsonb('metadata'),
+  embedding: customVector('embedding', { dimensions: 768 }),
 });
