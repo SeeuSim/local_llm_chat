@@ -25,9 +25,21 @@ export const MessagesTable = pgTable(
   }
 );
 
-export const EmbeddingsTable = pgTable('embeddings', {
-  id: serial('id').unique().primaryKey(),
-  content: text('content'),
-  metadata: jsonb('metadata'),
-  embedding: customVector('embedding', { dimensions: 768 }),
+// Embedding conf
+
+export const EmbeddingsTableConf = {
+  name: 'embeddings',
+  columns: {
+    id: { name: 'id' },
+    content: { name: 'content' },
+    metadata: { name: 'metadata' },
+    embedding: { name: 'embedding' },
+  },
+};
+
+export const EmbeddingsTable = pgTable(EmbeddingsTableConf.name, {
+  id: serial(EmbeddingsTableConf.columns.id.name).unique().primaryKey(),
+  content: text(EmbeddingsTableConf.columns.content.name),
+  metadata: jsonb(EmbeddingsTableConf.columns.metadata.name),
+  embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),
 });
