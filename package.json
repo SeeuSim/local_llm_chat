@@ -9,8 +9,8 @@
     "lint": "next lint",
     "prepare": "husky install",
     "fmt": "prettier --config ./.prettierrc \"**/*.{ts,tsx,js}\" --write",
-    "generate": "drizzle-kit generate:pg",
-    "migrate": "tsx src/lib/db/migrate.mts"
+    "generate": "env-cmd -f .env.dev drizzle-kit generate:pg",
+    "migrate": "env-cmd -f .env.dev tsx src/lib/db/migrate.mts"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
@@ -53,7 +53,6 @@
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "autoprefixer": "^10.4.16",
-    "dotenv": "^16.3.1",
     "drizzle-kit": "^0.20.9",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.4",

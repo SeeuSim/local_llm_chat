@@ -1,11 +1,6 @@
-import dotenv from 'dotenv';
-import path from 'path';
 import postgres from 'postgres';
-
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-
-dotenv.config({ path: path.resolve('./', '@/../.env.dev') });
 
 const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
