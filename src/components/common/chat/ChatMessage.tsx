@@ -1,8 +1,9 @@
 'use client';
 
+import { FaceIcon, PersonIcon } from '@radix-ui/react-icons';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { FaceIcon, PersonIcon } from '@radix-ui/react-icons';
 
 interface IChatMessageProps {
   role: 'system' | 'user';
