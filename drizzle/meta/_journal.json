@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1704355973898,
+      "when": 1704356995234,
       "tag": "0000_initial_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1704356800130,
-      "tag": "0001_add_message_index",
       "breakpoints": true
     }
   ]

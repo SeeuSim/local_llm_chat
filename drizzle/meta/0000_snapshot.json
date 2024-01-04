@@ -1,5 +1,5 @@
 {
-  "id": "103628a6-c837-4cbc-bb67-e5d560ef4ee0",
+  "id": "aa4247ff-75a1-4ae3-8e59-d0728e39ae2e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -38,12 +38,6 @@
       "name": "messages",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
         "room_id": {
           "name": "room_id",
           "type": "serial",
@@ -69,7 +63,15 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "time_index": {
+          "name": "time_index",
+          "columns": [
+            "time_stamp"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "messages_room_id_room_id_fk": {
           "name": "messages_room_id_room_id_fk",
@@ -86,11 +88,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "messages_id_room_id_pk": {
-          "name": "messages_id_room_id_pk",
+        "messages_room_id_time_stamp_pk": {
+          "name": "messages_room_id_time_stamp_pk",
           "columns": [
-            "id",
-            "room_id"
+            "room_id",
+            "time_stamp"
           ]
         }
       },

@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS "time_index" ON "messages" ("time_stamp");

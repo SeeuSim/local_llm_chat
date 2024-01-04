@@ -9,7 +9,6 @@ export const RoomTable = pgTable('room', {
 export const MessagesTable = pgTable(
   'messages',
   {
-    id: serial('id'),
     roomId: serial('room_id').references(() => RoomTable.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
@@ -20,7 +19,7 @@ export const MessagesTable = pgTable(
   },
   (table) => {
     return {
-      pk: primaryKey({ columns: [table.id, table.roomId] }),
+      pk: primaryKey({ columns: [table.roomId, table.timeStamp] }),
       timeIndex: index('time_index').on(table.timeStamp).asc(),
     };
   }
