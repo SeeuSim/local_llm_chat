@@ -13,7 +13,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
         <SideNav />
         <ScrollArea
           id='main-container'
-          className='h-[calc(100vh-92px)] translate-y-[-62px] overflow-y-auto overscroll-none bg-secondary scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border sm:ml-40 md:ml-48'
+          className='h-[calc(100vh-92px)] translate-y-[-62px] overflow-y-auto overscroll-none bg-background scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border sm:ml-40 md:ml-48'
         >
           <div id='main-container-top-padding' className='h-[62px] w-full bg-primary-foreground' />
           <div className='p-4'>{children}</div>

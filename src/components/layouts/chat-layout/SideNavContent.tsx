@@ -24,11 +24,9 @@ export const SideNavContent = () => {
       </Button>
       <ScrollArea className='flex h-[calc(100vh-160px)] w-full rounded-md border-y border-border/40'>
         <div className='flex flex-col gap-2'>
-          {getRooms()
-            // .sort((a, b) => a.lastModified.getTime() - b.lastModified.getTime())
-            .map((obj, index) => (
-              <RoomLink key={index} {...obj} />
-            ))}
+          {getRooms().map((obj, index) => (
+            <RoomLink key={index} {...obj} />
+          ))}
         </div>
       </ScrollArea>
     </div>

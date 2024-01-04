@@ -22,7 +22,7 @@ export const RoomLink = ({ summary }: IRoomLinkProps) => {
       className={cn(
         buttonVariants({ variant: 'link' }),
         'inline-flex justify-between rounded-md px-2 py-1.5 hover:no-underline',
-        'hover:bg-secondary'
+        'hover:cursor-pointer hover:bg-secondary'
       )}
     >
       <span className='text-sm font-normal'>{summary}</span>

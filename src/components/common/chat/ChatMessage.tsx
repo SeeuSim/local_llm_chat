@@ -15,8 +15,8 @@ export const ChatMessage = ({ role, content }: IChatMessageProps) => {
       <div className={cn('mb-1 flex flex-row items-center gap-2')}>
         <div
           className={cn(
-            'rounded-md border border-border bg-primary-foreground p-2 text-primary',
-            role === 'system' && 'bg-secondary text-secondary-foreground'
+            'rounded-md border border-border/70 bg-primary p-2 text-primary-foreground',
+            role === 'system' && 'border-border/40 bg-muted text-muted-foreground'
           )}
         >
           {role === 'system' ? <FaceIcon /> : <PersonIcon />}
@@ -25,8 +25,8 @@ export const ChatMessage = ({ role, content }: IChatMessageProps) => {
       </div>
       <Card
         className={cn(
-          'ml-5 flex w-full bg-card text-card-foreground',
-          role === 'system' && 'bg-neutral-200 dark:bg-neutral-700'
+          'ml-5 flex w-full border-border/70 bg-primary text-primary-foreground',
+          role === 'system' && 'border-border/40 bg-muted text-muted-foreground'
         )}
       >
         <CardContent className='flex flex-col gap-2 px-3 py-2'>
