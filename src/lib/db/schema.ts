@@ -1,15 +1,15 @@
 import { customVector } from '@useverk/drizzle-pgvector';
-import { index, jsonb, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const RoomTable = pgTable('room', {
-  id: serial('id').unique().primaryKey(),
+  id: uuid('id').unique().primaryKey().defaultRandom(),
   summary: text('summary'),
 });
 
 export const MessagesTable = pgTable(
   'messages',
   {
-    roomId: serial('room_id').references(() => RoomTable.id, {
+    roomId: uuid('room_id').references(() => RoomTable.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -38,7 +38,7 @@ export const EmbeddingsTableConf = {
 };
 
 export const EmbeddingsTable = pgTable(EmbeddingsTableConf.name, {
-  id: serial(EmbeddingsTableConf.columns.id.name).unique().primaryKey(),
+  id: uuid(EmbeddingsTableConf.columns.id.name).unique().primaryKey().defaultRandom(),
   content: text(EmbeddingsTableConf.columns.content.name),
   metadata: jsonb(EmbeddingsTableConf.columns.metadata.name),
   embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),

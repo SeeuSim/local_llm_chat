@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "embeddings" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"content" text,
 	"metadata" jsonb,
 	"embedding" vector(768),
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "embeddings" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "messages" (
-	"room_id" serial NOT NULL,
+	"room_id" uuid,
 	"time_stamp" timestamp,
 	"persona" text,
 	"content" text,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "messages" (
 ) PARTITION BY HASH ("room_id");
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "room" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"summary" text,
 	CONSTRAINT "room_id_unique" UNIQUE("id")
 );

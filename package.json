@@ -8,12 +8,12 @@
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",
     "prepare": "husky install",
-    "fmt": "prettier --config ./.prettierrc \"**/*.{ts,tsx,js}\" --write",
+    "fmt": "prettier --config ./.prettierrc \"**/*.{mts,ts,tsx,js}\" --write",
     "generate": "env-cmd -f .env.dev drizzle-kit generate:pg",
     "migrate": "env-cmd -f .env.dev tsx src/lib/db/migrate.mts"
   },
   "lint-staged": {
-    "**/*.{js,ts,tsx}": [
+    "**/*.{js,mts,ts,tsx}": [
       "prettier --write",
       "eslint --fix"
     ]

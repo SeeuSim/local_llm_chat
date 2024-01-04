@@ -1,5 +1,5 @@
 {
-  "id": "e929d79a-7104-47c9-bc3b-9d5e26d42950",
+  "id": "acb6864c-be37-4e1d-a6bb-d9e079e2d50d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -10,9 +10,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "content": {
           "name": "content",
@@ -52,9 +53,9 @@
       "columns": {
         "room_id": {
           "name": "room_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "time_stamp": {
           "name": "time_stamp",
@@ -116,9 +117,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "summary": {
           "name": "summary",
