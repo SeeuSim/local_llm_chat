@@ -1,5 +1,5 @@
 import { customVector } from '@useverk/drizzle-pgvector';
-import { pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const RoomTable = pgTable('room', {
   id: serial('id').unique().primaryKey(),
@@ -21,6 +21,7 @@ export const MessagesTable = pgTable(
   (table) => {
     return {
       pk: primaryKey({ columns: [table.id, table.roomId] }),
+      timeIndex: index('time_index').on(table.timeStamp).asc(),
     };
   }
 );
