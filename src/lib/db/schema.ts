@@ -1,3 +1,4 @@
+import { customVector } from '@useverk/drizzle-pgvector';
 import { pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const RoomTable = pgTable('room', {
@@ -23,3 +24,8 @@ export const MessagesTable = pgTable(
     };
   }
 );
+
+export const EmbeddingsTable = pgTable('embeddings', {
+  id: serial('id').unique().primaryKey(),
+  embedding: customVector('embedding', { dimensions: 1536 }),
+});

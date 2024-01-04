@@ -26,6 +26,9 @@ dependencies:
   '@radix-ui/react-slot':
     specifier: ^1.0.2
     version: 1.0.2(@types/react@18.2.46)(react@18.2.0)
+  '@useverk/drizzle-pgvector':
+    specifier: ^1.0.11
+    version: 1.0.11(@types/pg@8.10.9)(@types/react@18.2.46)(postgres@3.4.3)(react@18.2.0)
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -1882,6 +1885,36 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
+
+  /@useverk/drizzle-pgvector@1.0.11(@types/pg@8.10.9)(@types/react@18.2.46)(postgres@3.4.3)(react@18.2.0):
+    resolution: {integrity: sha512-x1kX69sdBAImgqZagRSaqXSq2uu03nrBmnjDBuzoA3mgXz1dudaifhNFj3WrnEh1jEKWarxBRS1fzyTlfe/hfw==}
+    dependencies:
+      drizzle-orm: 0.29.3(@types/pg@8.10.9)(@types/react@18.2.46)(pg@8.11.3)(postgres@3.4.3)(react@18.2.0)
+      pg: 8.11.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-rds-data'
+      - '@cloudflare/workers-types'
+      - '@libsql/client'
+      - '@neondatabase/serverless'
+      - '@opentelemetry/api'
+      - '@planetscale/database'
+      - '@types/better-sqlite3'
+      - '@types/pg'
+      - '@types/react'
+      - '@types/sql.js'
+      - '@vercel/postgres'
+      - better-sqlite3
+      - bun-types
+      - expo-sqlite
+      - knex
+      - kysely
+      - mysql2
+      - pg-native
+      - postgres
+      - react
+      - sql.js
+      - sqlite3
+    dev: false
 
   /abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
