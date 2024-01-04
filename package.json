@@ -10,7 +10,8 @@
     "prepare": "husky install",
     "fmt": "prettier --config ./.prettierrc \"**/*.{mts,ts,tsx,js}\" --write",
     "generate": "env-cmd -f .env.dev drizzle-kit generate:pg",
-    "migrate": "env-cmd -f .env.dev tsx src/lib/db/migrate.mts"
+    "migrate": "env-cmd -f .env.dev tsx src/lib/db/migrate.mts",
+    "introspect": "env-cmd -f .env.dev drizzle-kit studio"
   },
   "lint-staged": {
     "**/*.{js,mts,ts,tsx}": [
