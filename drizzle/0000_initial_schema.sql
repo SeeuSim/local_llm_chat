@@ -7,11 +7,12 @@ CREATE TABLE IF NOT EXISTS "embeddings" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "messages" (
+	"id" uuid DEFAULT gen_random_uuid(),
 	"room_id" uuid,
 	"time_stamp" timestamp,
 	"persona" text,
 	"content" text,
-	CONSTRAINT "messages_room_id_time_stamp_pk" PRIMARY KEY("room_id","time_stamp")
+	CONSTRAINT "messages_room_id_id_pk" PRIMARY KEY("room_id","id")
 ) PARTITION BY HASH ("room_id");
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "room" (

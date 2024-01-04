@@ -1,5 +1,5 @@
 {
-  "id": "acb6864c-be37-4e1d-a6bb-d9e079e2d50d",
+  "id": "31dd82ee-a9a7-4832-998c-e36832502956",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -51,6 +51,13 @@
       "name": "messages",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
         "room_id": {
           "name": "room_id",
           "type": "uuid",
@@ -101,11 +108,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "messages_room_id_time_stamp_pk": {
-          "name": "messages_room_id_time_stamp_pk",
+        "messages_room_id_id_pk": {
+          "name": "messages_room_id_id_pk",
           "columns": [
             "room_id",
-            "time_stamp"
+            "id"
           ]
         }
       },
