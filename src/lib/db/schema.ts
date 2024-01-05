@@ -42,5 +42,5 @@ export const EmbeddingsTable = pgTable(EmbeddingsTableConf.name, {
   id: uuid(EmbeddingsTableConf.columns.id.name).unique().primaryKey().defaultRandom(),
   content: text(EmbeddingsTableConf.columns.content.name),
   metadata: jsonb(EmbeddingsTableConf.columns.metadata.name),
-  embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 4096 }),
+  embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),
 });

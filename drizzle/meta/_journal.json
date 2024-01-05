@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1704411273684,
+      "when": 1704461495098,
       "tag": "0000_initial_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1704442298883,
-      "tag": "0001_ollama_mistral_embedding",
       "breakpoints": true
     }
   ]

@@ -21,7 +21,9 @@ export async function POST(req: Request) {
   logger.info(
     {
       req,
-      params: result.length,
+      result: {
+        length: result.length,
+      },
     },
     formatLoggerMessage(PATH, 'Embeddings generated successfully')
   );

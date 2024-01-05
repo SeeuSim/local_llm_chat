@@ -1,5 +1,5 @@
 {
-  "id": "31dd82ee-a9a7-4832-998c-e36832502956",
+  "id": "2da50191-904f-4739-aecc-b47692ac9b55",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -97,6 +97,7 @@
           "name": "messages_room_id_room_id_fk",
           "tableFrom": "messages",
           "tableTo": "room",
+          "schemaTo": "public",
           "columnsFrom": [
             "room_id"
           ],

@@ -1,1 +1,0 @@
-ALTER TABLE "embeddings" ALTER COLUMN "embedding" SET DATA TYPE vector(4096);
