@@ -16,6 +16,9 @@ export async function POST(req: Request) {
   const model = await EmbeddingsSingleton.getInstance();
   const result = await model.embedQuery('Hello world!');
 
+  await new Promise((resolve, reject) => {
+    setTimeout(resolve, 10000);
+  });
   logger.info(
     {
       req,
