@@ -1,3 +1,8 @@
+/* eslint no-var: 0 */
+
+import type { TEmbeddingsSingleton } from '@/app/api/embed/embeddings';
+import type { TVectorStore } from '@/app/api/embed/vectorStore';
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -10,6 +15,10 @@ declare global {
       DB_USER: string;
       DB_PASSWORD: string;
     }
+  }
+  namespace globalThis {
+    var EmbeddingSingleton: TEmbeddingsSingleton | undefined;
+    var VectorStoreSingleton: TVectorStore | undefined;
   }
 }
 
