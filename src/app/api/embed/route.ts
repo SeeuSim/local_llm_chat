@@ -1,6 +1,6 @@
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
-import EmbeddingsSingleton from './embeddings';
+import EmbeddingsSingleton from '@/lib/models/embeddings';
 
 const PATH = 'api/embed';
 

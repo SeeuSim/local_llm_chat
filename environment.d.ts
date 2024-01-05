@@ -1,7 +1,7 @@
 /* eslint no-var: 0 */
 
-import type { TEmbeddingsSingleton } from '@/app/api/embed/embeddings';
-import type { TVectorStore } from '@/app/api/embed/vectorStore';
+import type { TEmbeddingsSingleton } from '@/lib/models/embeddings';
+import type { TVectorStore } from '@/lib/models/vectorStore';
 
 declare global {
   namespace NodeJS {

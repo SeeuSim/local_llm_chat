@@ -1,6 +1,7 @@
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 
 import { PgVectorStoreConfig } from '@/lib/db/vectorStoreConfig';
+
 import EmbeddingsSingleton from './embeddings';
 
 const getVectorStore = () =>
