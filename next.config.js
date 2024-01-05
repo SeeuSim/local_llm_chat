@@ -20,6 +20,10 @@ const nextConfig = {
   },
   reactStrictMode: true,
 
+  experimental: {
+    serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
+  },
+
   // For use with CMS like Nextra
   webpack: (config, options) => {
     config.resolve.modules.push(path.resolve('.'));

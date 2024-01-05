@@ -1,6 +1,7 @@
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
-import EmbeddingsSingleton from '@/lib/models/embeddings';
+import HuggingFaceEmbeddingSingleton from '@/lib/models/huggingfaceEmbeddings';
+// import OllamaEmbeddingSingleton from '@/lib/models/ollamaEmbeddings';
 
 const PATH = 'api/embed';
 
@@ -13,12 +14,10 @@ export async function POST(req: Request) {
     formatLoggerMessage(PATH, 'Invocation starting', process.env.NODE_ENV)
   );
 
-  const model = await EmbeddingsSingleton.getInstance();
+  const model = await HuggingFaceEmbeddingSingleton.getInstance();
+  // const model = await OllamaEmbeddingSingleton.getInstance();
   const result = await model.embedQuery('Hello world!');
 
-  await new Promise((resolve, reject) => {
-    setTimeout(resolve, 10000);
-  });
   logger.info(
     {
       req,

@@ -1,6 +1,7 @@
 /* eslint no-var: 0 */
 
-import type { TEmbeddingsSingleton } from '@/lib/models/embeddings';
+import type { THuggingFaceEmbeddingSingleton } from '@/lib/models/huggingfaceEmbeddings';
+import type { TOllamaEmbeddingSingleton } from '@/lib/models/ollamaEmbeddings';
 import type { TVectorStore } from '@/lib/models/vectorStore';
 
 declare global {
@@ -17,7 +18,8 @@ declare global {
     }
   }
   namespace globalThis {
-    var EmbeddingSingleton: TEmbeddingsSingleton | undefined;
+    var HuggingFaceEmbeddingSingleton: THuggingFaceEmbeddingSingleton | undefined;
+    var OllamaEmbeddingSingleton: TOllamaEmbeddingSingleton | undefined;
     var VectorStoreSingleton: TVectorStore | undefined;
   }
 }
