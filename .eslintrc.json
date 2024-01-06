@@ -5,6 +5,7 @@
     "plugin:@typescript-eslint/recommended",
     "prettier",
     "plugin:tailwindcss/recommended"
+    // "plugin:@tanstack/eslint-plugin-query"
   ],
   "parserOptions": {
     "ecmaVersion": "latest",

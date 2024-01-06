@@ -1,5 +1,4 @@
 import { getReasonPhrase, type StatusCodes } from 'http-status-codes';
-import type { NextApiRequest } from 'next';
 import { NextRequest } from 'next/server';
 import pinoLogger, { type Logger } from 'pino';
 
@@ -17,7 +16,7 @@ interface IErrorFields extends Error {
 
 type IErrorFieldsForLog = Pick<IErrorFields, 'status' | 'msg' | 'code'>;
 
-export const getLogger = (req?: NextApiRequest) => {
+export const getLogger = (req?: Request) => {
   const logger: Logger = pinoLogger({
     mixin: (_context) => {
       return { req, env: process.env.VAR_ONE };
@@ -33,7 +32,7 @@ export const getLogger = (req?: NextApiRequest) => {
         const base = JSON.parse(JSON.stringify(_p));
         base['level'] = pinoLogger.levels.labels[base['level']].toUpperCase();
         base['env'] = process.env.VAR_ONE;
-        console.log(JSON.stringify(base));
+        // console.log(JSON.stringify(base));
       },
       serialize: true,
     },
@@ -46,14 +45,15 @@ export const getLogger = (req?: NextApiRequest) => {
       //     otherProperty: _user.property
       //   }
       // },
-      req: (_req: NextRequest | NextApiRequest): IRequestFields => {
+      req: (_req: NextRequest | Request): IRequestFields => {
         return {
           method: _req.method,
           url:
             _req instanceof NextRequest
               ? _req.url?.substring(_req.url?.lastIndexOf('/'))
               : _req.url,
-          referrer: _req instanceof NextRequest ? undefined : _req.headers.referer,
+          referrer:
+            _req instanceof NextRequest ? undefined : _req.headers.get('referrer') ?? undefined,
         };
       },
       error: (_err: IErrorFields): IErrorFieldsForLog => {
@@ -68,3 +68,5 @@ export const getLogger = (req?: NextApiRequest) => {
 
   return logger;
 };
+
+export * from './utils';
