@@ -2,7 +2,7 @@ import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 
 import { PgVectorStoreConfig } from '@/lib/db/vectorStoreConfig';
 
-import HuggingFaceEmbeddingSingleton from './huggingfaceEmbeddings';
+import HuggingFaceEmbeddingSingleton from './embeddings/huggingfaceEmbeddings';
 // import OllamaEmbeddingSingleton from './ollamaEmbeddings';
 
 const getVectorStore = () =>
@@ -10,7 +10,7 @@ const getVectorStore = () =>
     static instance: PGVectorStore | null = null;
     static async getInstance() {
       if (this.instance === null) {
-        const embeddings = await HuggingFaceEmbeddingSingleton?.getInstance();
+        const embeddings = await HuggingFaceEmbeddingSingleton.getInstance();
         // const embeddings = await OllamaEmbeddingSingleton.getInstance();
         this.instance = await PGVectorStore.initialize(embeddings, PgVectorStoreConfig);
       }

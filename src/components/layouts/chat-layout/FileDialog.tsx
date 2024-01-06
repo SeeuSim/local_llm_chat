@@ -25,12 +25,27 @@ export const FileDialog = () => {
     _setIsOpen(newIsOpen);
   };
 
-  const { isError, isPending, isSuccess, mutate } = useMutation({
+  const {
+    isError,
+    isPending,
+    isSuccess,
+    mutate: onSubmit,
+  } = useMutation({
     mutationKey: ['chat/file-upload', files],
-    mutationFn: async (files: Array<File>) => {
-      return fetch('/api/embed', {
+    mutationFn: async () => {
+      if (files.length === 0) {
+        return;
+      }
+
+      const payload = new FormData();
+      files.forEach((file) => payload.append('files', file));
+
+      payload.append('roomId', `1`);
+
+      // payload.append('roomId', 'roomId');
+      return fetch('/api/embed/documents', {
         method: 'POST',
-        body: JSON.stringify({}),
+        body: payload,
         signal: controller.signal,
       });
     },
@@ -128,7 +143,7 @@ export const FileDialog = () => {
           <Button
             disabled={isSubmitDisabled}
             onClick={() => {
-              mutate([]);
+              onSubmit();
             }}
             className='inline-flex w-min items-center gap-2 whitespace-nowrap disabled:cursor-not-allowed'
           >

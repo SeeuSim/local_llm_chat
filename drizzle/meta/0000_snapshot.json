@@ -1,5 +1,5 @@
 {
-  "id": "2da50191-904f-4739-aecc-b47692ac9b55",
+  "id": "6e43dc4e-109a-4b93-9944-ed8043c617e9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -14,6 +14,13 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "createdTime": {
+          "name": "createdTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         },
         "content": {
           "name": "content",

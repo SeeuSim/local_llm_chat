@@ -1,6 +1,6 @@
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
-import HuggingFaceEmbeddingSingleton from '@/lib/models/huggingfaceEmbeddings';
+import HuggingFaceEmbeddingSingleton from '@/lib/models/embeddings/huggingfaceEmbeddings';
 // import OllamaEmbeddingSingleton from '@/lib/models/ollamaEmbeddings';
 
 const PATH = 'api/embed';
