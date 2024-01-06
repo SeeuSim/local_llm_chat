@@ -23,9 +23,12 @@ export async function POST(req: Request) {
   );
 
   // 2. Parse and split chunks
-  const roomId = payload.get('roomId') as string;
+  const roomId = payload.get('roomId') as string | null;
   const files = payload.getAll('files') as Array<File>;
-  // Validate files, roomId
+  if (!roomId || roomId === null || !files || !Array.isArray(files)) {
+    // Validate files, roomId
+    return new Response(JSON.stringify({ message: 'Invalid Params' }), { status: 400 });
+  }
   const documents = await processPDFFiles(files, roomId);
   const chunks = await getTextChunks(documents);
   logger.info(
@@ -78,10 +81,13 @@ export async function POST(req: Request) {
       formatLoggerMessage(PATH, 'These errors occurred.')
     );
     return new Response(
-      JSON.stringify({ message: 'These insertions occurred', errors, successfulInserts }),
+      JSON.stringify({
+        message: 'These insertions and errors occurred',
+        errors,
+        successfulInserts,
+      }),
       {
         status: 500,
-        statusText: 'Errors occurred in insertion.',
       }
     );
   }
@@ -94,5 +100,11 @@ export async function POST(req: Request) {
     },
     formatLoggerMessage(PATH, 'Documents inserted successfully.')
   );
-  return new Response(new Blob(), { status: 200, statusText: 'Documents inserted successfully' });
+  return new Response(
+    JSON.stringify({
+      message: 'Documents inserted successfully',
+      successfulInserts,
+    }),
+    { status: 200 }
+  );
 }

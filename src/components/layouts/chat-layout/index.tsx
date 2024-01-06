@@ -16,7 +16,9 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
           className='h-[calc(100vh-92px)] translate-y-[-62px] overflow-y-auto overscroll-none bg-background scrollbar-thin scrollbar-track-inherit scrollbar-thumb-border sm:ml-40 md:ml-48'
         >
           <div id='main-container-top-padding' className='h-[62px] w-full bg-primary-foreground' />
-          <div className='p-4'>{children}</div>
+          <div id='main-container-messages' className='p-4'>
+            <div className='mr-4 flex max-w-screen-md flex-col gap-4 lg:mx-auto'>{children}</div>
+          </div>
         </ScrollArea>
         <ChatInput />
       </main>
