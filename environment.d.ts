@@ -1,5 +1,6 @@
 /* eslint no-var: 0 */
 
+import type { TPGInstance } from '@/lib/db/dbInstance';
 import type { TChatOllamaSingleton } from '@/lib/models/chat/chatOllama';
 import type { THuggingFaceEmbeddingSingleton } from '@/lib/models/embeddings/huggingfaceEmbeddings';
 import type { TOllamaEmbeddingSingleton } from '@/lib/models/embeddings/ollamaEmbeddings';
@@ -25,6 +26,7 @@ declare global {
     var OllamaEmbeddingSingleton: TOllamaEmbeddingSingleton | undefined;
     var VectorStoreSingleton: TVectorStore | undefined;
     var ChatOllamaSingleton: TChatOllamaSingleton | undefined;
+    var PgInstance: TPGInstance | undefined;
   }
 }
 
