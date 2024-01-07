@@ -1,5 +1,5 @@
 {
-  "id": "6e43dc4e-109a-4b93-9944-ed8043c617e9",
+  "id": "c77e6fb1-3070-4851-81ab-5ab8bb405cfb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -75,7 +75,8 @@
           "name": "time_stamp",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "persona": {
           "name": "persona",

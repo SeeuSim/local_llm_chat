@@ -16,7 +16,7 @@ export const MessagesTable = pgTable(
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-    timeStamp: timestamp('time_stamp'),
+    timeStamp: timestamp('time_stamp').defaultNow(),
     persona: text('persona'),
     content: text('content'),
   },
