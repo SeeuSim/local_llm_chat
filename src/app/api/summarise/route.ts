@@ -1,7 +1,5 @@
-import { StringOutputParser } from '@langchain/core/output_parsers';
-
 import OllamaSingleton from '@/lib/models/chat/chatOllama';
-import { iteratorToStream } from '@/lib/utils';
+import { getStreamingUtils } from '@/lib/streaming';
 import {
   PROMPT_REGEXES,
   PROMPT_SUMMARISATION_TEMPLATES,
@@ -18,6 +16,10 @@ export async function POST(req: Request) {
     modelName = body.model as TSupportedModel;
   }
 
+  if (!body.userMessage && !body.systemMessage) {
+    return new Response(JSON.stringify({}), { status: 401 });
+  }
+
   const conversation: Array<string> = [];
   if (body.userMessage) {
     conversation.push(`User: ${body.userMessage.replaceAll(PROMPT_REGEXES[modelName], '')}\r\n`);
@@ -30,9 +32,10 @@ export async function POST(req: Request) {
 
   const SummarisationTemplate = PROMPT_SUMMARISATION_TEMPLATES[modelName](conversation);
 
+  const { stream, callbacks } = getStreamingUtils();
   const model = await OllamaSingleton.getInstance();
+  model.callbacks = callbacks;
+  model.invoke(SummarisationTemplate);
 
-  const stream = model.pipe(new StringOutputParser()).stream(SummarisationTemplate);
-
-  return new Response(await iteratorToStream(stream));
+  return new Response(stream);
 }
