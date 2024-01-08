@@ -9,14 +9,15 @@ import {
   type HTMLAttributes,
   type KeyboardEventHandler,
 } from 'react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Dropzone } from '@/components/ui/drop-zone';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 
 interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {
   height?: number;
@@ -25,6 +26,7 @@ interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {
 export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
   ({ className, height }, ref) => {
     const { roomId } = useContext(roomIDContext);
+    const { toast } = useToast();
 
     const controller = new AbortController();
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,27 +66,35 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
       },
       onSuccess: () => {},
       onError(error, _variables, _context) {
-        toast('Oh no, an error occurred', {
-          duration: 2000,
+        toast({
+          title: 'Oh no! An error occurred',
           description: error.message,
-          descriptionClassName: 'bg-destructive text-destructive-foreground',
+          variant: 'destructive',
+          duration: 2000,
         });
       },
     });
 
-    const { mutate: createRoom } = useMutation({
+    const { mutate: createRoom } = useMutation<Partial<IAPIChatRoomCreateResponse>>({
       mutationKey: ['room/create'],
       mutationFn: async () => {
-        return fetch('api/chat/room/create', { method: 'POST' });
+        return fetch('api/chat/room/create', { method: 'POST' }).then((res) => res.json());
       },
       async onSuccess(data, _variables, _context) {
-        const response = (await data.json()) as { id: string };
-
-        toast('Room has been created', {
-          description: response.id,
-          duration: 2000,
-        });
-        submitMessage(response.id);
+        if (!data.id) {
+          toast({
+            title: 'Oh no, an error occurred while creating a room',
+            description: data.error
+              ? JSON.stringify(data.error)
+              : data.rooms
+                ? JSON.stringify(data.rooms)
+                : data.message ?? '',
+            variant: 'destructive',
+            duration: 2000,
+          });
+          return;
+        }
+        submitMessage(data.id);
       },
     });
 

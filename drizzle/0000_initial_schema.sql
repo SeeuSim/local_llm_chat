@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS "messages" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "room" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"createdTime" timestamp DEFAULT now(),
+	"modifiedTime" timestamp DEFAULT now(),
 	"summary" text,
 	CONSTRAINT "room_id_unique" UNIQUE("id")
 );
