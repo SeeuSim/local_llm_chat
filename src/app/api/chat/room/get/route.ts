@@ -1,5 +1,6 @@
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
+import { IAPIChatRoomGetOutput } from './types';
 
 export async function POST(req: Request) {
   try {
@@ -22,12 +23,8 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-    return new Response(
-      JSON.stringify({
-        rooms,
-      }),
-      { status: 200 }
-    );
+    const output: IAPIChatRoomGetOutput = { rooms };
+    return new Response(JSON.stringify(output), { status: 200 });
   } catch (error) {
     return new Response(
       JSON.stringify({

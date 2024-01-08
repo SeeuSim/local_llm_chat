@@ -10,9 +10,11 @@ import { useToast } from '@/components/ui/use-toast';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 
 import { ChatMessage } from './ChatMessage';
+import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
+  const { messages, setMessages } = useContext(chatRoomMessagesContext);
   const { toast } = useToast();
 
   const {
@@ -38,6 +40,12 @@ const Room = () => {
   });
 
   useEffect(() => {
+    if (setMessages !== undefined && initialMessages && initialMessages.messages !== undefined) {
+      setMessages((prevMessages) => [...initialMessages.messages, ...prevMessages]);
+    }
+  }, [setMessages, initialMessages]);
+
+  useEffect(() => {
     if (error !== null) {
       toast({
         variant: 'destructive',
@@ -50,24 +58,22 @@ const Room = () => {
     }
   }, [error]);
 
-  return initialMessages !== undefined &&
-    initialMessages.messages &&
-    initialMessages.messages.length !== 0 ? (
+  return messages !== undefined && messages.length > 0 ? (
     <>
-      {initialMessages.messages.map((message, index) => (
+      {messages.map((message, index) => (
         <ChatMessage
           key={message.id}
-          role={message.persona !== null ? (message.persona as 'system' | 'user') : 'user'}
+          role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
           content={message.content ?? ''}
         />
       ))}
     </>
-  ) : initialMessages !== undefined ? (
+  ) : messages !== undefined && messages.length === 0 ? (
     <>
-      <span>No messages here. Send one!</span>
+      <span>No messages here. Send some!</span>
     </>
   ) : (
-    initialMessages === undefined &&
+    messages === undefined &&
     isFetching && (
       <>
         <span>Loading...</span>
