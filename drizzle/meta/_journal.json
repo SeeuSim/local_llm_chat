@@ -15,6 +15,13 @@
       "when": 1704683668410,
       "tag": "0001_add_room_sort_by_modified_time",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704690625071,
+      "tag": "0002_add_message_documents",
+      "breakpoints": true
     }
   ]
 }

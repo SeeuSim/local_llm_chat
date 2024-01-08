@@ -28,6 +28,7 @@ export const MessagesTable = pgTable(
     timeStamp: timestamp('time_stamp').defaultNow(),
     persona: text('persona'),
     content: text('content'),
+    documentTitles: text('document_titles').array().default([]),
   },
   (table) => {
     return {

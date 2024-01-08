@@ -1,37 +1,19 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { useMutation } from '@tanstack/react-query';
+'use client';
+
+import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { useQuery } from '@tanstack/react-query';
+import { useContext, useState } from 'react';
 
 const Room = () => {
-  const {
-    mutate: query,
-    isPending,
-    isSuccess,
-    isError,
-  } = useMutation<any>({
-    mutationKey: ['Summarise'],
-    mutationFn: async () => {
-      return fetch('/api/summarise', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userMessage: 'Hello World',
-          systemMessage: "Go away - I don't want to talk to you",
-        }),
-      });
-    },
-  });
+  const { roomId } = useContext(roomIDContext);
 
-  return (
-    <div>
-      <Button onClick={() => query()}>
-        <span>Send request</span>
-      </Button>
-    </div>
-  );
+  const { data: initialMessages } = useQuery({ queryKey: ['chat', 'messages', roomId] });
+
+  const [messages, setMessages] = useState([]);
+
+  return <div />;
 };
 
 export default Room;
