@@ -9,10 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import { useContext } from 'react';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useContext } from 'react';
 
 interface IRoomLinkProps {
   id: string;
@@ -40,11 +40,21 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
           <DotsVerticalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent className='flex flex-col'>
-          <DropdownMenuItem className='inline-flex items-center gap-3 text-sm focus-visible:cursor-pointer'>
+          <DropdownMenuItem
+            className={cn(
+              'inline-flex items-center gap-3 text-sm',
+              'hover:cursor-pointer focus-visible:cursor-pointer'
+            )}
+          >
             <Pencil1Icon />
             <span>Rename</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className='inline-flex items-center gap-3 text-sm text-destructive focus-visible:cursor-pointer focus-visible:bg-destructive-foreground focus-visible:text-destructive'>
+          <DropdownMenuItem
+            className={cn(
+              'inline-flex items-center gap-3 text-sm text-destructive',
+              'focus:cursor-pointer focus:bg-destructive-foreground focus:text-destructive'
+            )}
+          >
             <TrashIcon />
             <span>Delete Chat</span>
           </DropdownMenuItem>

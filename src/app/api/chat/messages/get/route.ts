@@ -1,7 +1,9 @@
+import { eq } from 'drizzle-orm';
+
 import PgInstance from '@/lib/db/dbInstance';
 import { MessagesTable } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
-import { IAPIChatMessagesGetParams } from './types';
+
+import type { IAPIChatMessagesGetOutput, IAPIChatMessagesGetParams } from './types';
 
 export async function POST(req: Request) {
   const params: Partial<IAPIChatMessagesGetParams> = await req.json();
@@ -31,7 +33,8 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-    return new Response(JSON.stringify({ messages }), { status: 200 });
+    const output: IAPIChatMessagesGetOutput = { messages };
+    return new Response(JSON.stringify(output), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error }), { status: 500 });
   }

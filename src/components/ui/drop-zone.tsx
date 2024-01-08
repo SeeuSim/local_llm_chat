@@ -69,7 +69,10 @@ export function Dropzone({
   return (
     <>
       <Card
-        className={cn('border border-dashed bg-muted hover:border-muted-foreground/50', className)}
+        className={cn(
+          'border border-dashed bg-muted shadow-none hover:border-muted-foreground/50',
+          className
+        )}
       >
         <CardContent
           className='flex flex-col items-center justify-center gap-2 p-3 text-xs'
@@ -77,7 +80,7 @@ export function Dropzone({
           onDrop={handleDrop}
         >
           <div className='flex items-center justify-center gap-2 text-muted-foreground'>
-            <span className='font-medium'>Drag Files to Upload or</span>
+            <span className='font-medium'>Drag Files here to Upload or</span>
             <Button
               disabled={blockInteraction}
               variant='default'
