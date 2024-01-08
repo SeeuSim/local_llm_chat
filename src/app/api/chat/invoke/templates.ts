@@ -2,13 +2,16 @@ export const baseTemplate = `[INST]\r\n{question}\r\n[/INST]`;
 
 export const baseChatHistoryTemplate = `{history}\r\n[INST]{question}[/INST]`;
 
-export const userSystemPairTemplate = `<s>
-  [INST]
-  {user}
-  [/INST]
-  {model}
-  </s>`;
+// QA with documents
 
+/**
+ * Generating reflection question for accurate question for vector retrieval
+ *
+ * Required params:
+ * - `chat_history`: A string formatted history with alternating question and answer pairs,
+ *   like so: USER: <user>\n SYSTEM: <system>
+ * - `question`: The user's last question
+ */
 export const chatHistoryReflectTemplate =
   `<s>
   [INST]
@@ -44,6 +47,11 @@ export const documentQATemplate =
   `Anything between the preceding 'context' html blocks is retrieved ` +
   `from a knowledge bank, not part of the conversation with the user.`;
 
+/**
+ * Requires the following params:
+ * - `context`: The documents from the knowledge bank
+ * - `question`: The user's question
+ */
 export const baseDocumentQATemplate = `<s>
   ${documentQATemplate}
 </s>
