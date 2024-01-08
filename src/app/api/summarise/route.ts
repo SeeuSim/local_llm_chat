@@ -1,4 +1,4 @@
-import OllamaSingleton from '@/lib/models/chat/chatOllama';
+import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
 import { getStreamingUtils } from '@/lib/streaming';
 import {
   PROMPT_REGEXES,
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   const SummarisationTemplate = PROMPT_SUMMARISATION_TEMPLATES[modelName](conversation);
 
   const { stream, callbacks } = getStreamingUtils();
-  const model = await OllamaSingleton.getInstance();
+  const model = await ChatOllamaSingleton.getInstance();
   model.callbacks = callbacks;
   model.invoke(SummarisationTemplate);
 

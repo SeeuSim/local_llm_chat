@@ -17,13 +17,13 @@ const getOllamaSingleton = () =>
 
 export type TChatOllamaSingleton = ReturnType<typeof getOllamaSingleton>;
 
-let OllamaSingleton: TChatOllamaSingleton;
+let ChatOllamaSingleton: TChatOllamaSingleton;
 if (process.env.NODE_ENV !== 'production') {
   if (!global.ChatOllamaSingleton) {
     global.ChatOllamaSingleton = getOllamaSingleton();
   }
-  OllamaSingleton = global.ChatOllamaSingleton;
+  ChatOllamaSingleton = global.ChatOllamaSingleton;
 } else {
-  OllamaSingleton = getOllamaSingleton();
+  ChatOllamaSingleton = getOllamaSingleton();
 }
-export default OllamaSingleton;
+export default ChatOllamaSingleton;

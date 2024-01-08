@@ -1,0 +1,141 @@
+import { RunnableSequence } from 'langchain/schema/runnable';
+import { StringOutputParser } from 'langchain/schema/output_parser';
+import { PromptTemplate } from 'langchain/prompts';
+import type { Document } from 'langchain/document';
+
+import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
+import {
+  baseTemplate,
+  baseChatHistoryTemplate,
+  chatHistoryReflectTemplate,
+  baseDocumentQATemplate,
+  chatDocumentQATemplate,
+} from './templates';
+import VectorStore from '@/lib/models/vectorStore';
+import type { TChatMessage } from './types';
+
+const formatDocsAsString = (docs: Document[]) => {
+  return docs
+    .map((document, index) => `<doc id='${index}'>${document.pageContent}</doc>`)
+    .join('\r\n');
+};
+
+export const BaseQuestionHandler = async (question: string) => {
+  const prompt = PromptTemplate.fromTemplate(baseTemplate);
+  const ollama = await ChatOllamaSingleton.getInstance();
+  const chain = prompt.pipe(ollama).pipe(new StringOutputParser());
+  return chain.stream({ question });
+};
+
+const formatChatTrain = (chatHistory: Array<TChatMessage>) => {
+  return chatHistory
+    .reduce(
+      (result, _value, index, sourceArray) =>
+        index % 2 === 0 ? [...result, sourceArray.slice(index, index + 2)] : result,
+      [] as Array<Array<TChatMessage>>
+    )
+    .map(
+      ([userMessage, systemMessage]) => `
+  <s>
+  [INST]
+  ${userMessage.content}
+  [/INST]
+  ${systemMessage.content}
+  </s>
+  `
+    )
+    .join('\r\n');
+};
+
+export const ChatHistoryHandler = async (question: string, chatHistory: Array<TChatMessage>) => {
+  if (chatHistory.length === 0) {
+    return BaseQuestionHandler(question);
+  }
+
+  const prompt = PromptTemplate.fromTemplate(baseChatHistoryTemplate);
+
+  const model = await ChatOllamaSingleton.getInstance();
+
+  const chain = RunnableSequence.from([
+    {
+      question: (input) => input.question,
+      history: RunnableSequence.from([(input) => input.chat_history, formatChatTrain]),
+    },
+    prompt,
+    model,
+    new StringOutputParser(),
+  ]);
+
+  return chain.stream({ question, chat_history: chatHistory });
+};
+
+export const BaseDocumentHandler = async (question: string, roomId: string) => {
+  const vectorstore = await VectorStore.getInstance();
+  const retriever = vectorstore.asRetriever({ filter: { roomId } });
+  const retrievalChain = RunnableSequence.from([
+    (input) => input.question,
+    retriever,
+    formatDocsAsString,
+  ]);
+
+  const model = await ChatOllamaSingleton.getInstance();
+
+  const fullChain = RunnableSequence.from([
+    {
+      question: (input) => input.question,
+      context: RunnableSequence.from([(input) => ({ question: input.question }), retrievalChain]),
+    },
+    RunnableSequence.from([
+      PromptTemplate.fromTemplate(baseDocumentQATemplate),
+      model,
+      new StringOutputParser(),
+    ]),
+  ]);
+
+  return fullChain.stream({ question });
+};
+
+export const ChatDocumentHandler = async (
+  question: string,
+  chatHistory: Array<TChatMessage>,
+  roomId: string
+) => {
+  const vectorstore = await VectorStore.getInstance();
+  const retriever = vectorstore.asRetriever({ filter: { roomId } });
+  const model = await ChatOllamaSingleton.getInstance();
+
+  const retrievalChain = RunnableSequence.from([
+    PromptTemplate.fromTemplate(chatHistoryReflectTemplate),
+    model,
+    new StringOutputParser(),
+    retriever,
+    formatDocsAsString,
+  ]);
+
+  const fullChain = RunnableSequence.from([
+    {
+      question: (input) => input.question,
+      history: RunnableSequence.from([(input) => input.chat_history, formatChatTrain]),
+      context: RunnableSequence.from([
+        (input) => {
+          return {
+            question: input.question,
+            chat_history: input.chat_history
+              .map(
+                (message: TChatMessage) => `${message.persona?.toUpperCase()}: ${message.content}`
+              )
+              .join('\n'),
+          };
+        },
+        retrievalChain,
+      ]),
+    },
+    RunnableSequence.from([
+      PromptTemplate.fromTemplate(chatDocumentQATemplate),
+      model,
+      new StringOutputParser(),
+    ]),
+  ]);
+
+  return fullChain.stream({ question, chat_history: chatHistory });
+};
