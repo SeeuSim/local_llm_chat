@@ -24,21 +24,24 @@ export async function POST(req: Request) {
   try {
     let stream: IterableReadableStream<string> | null = null;
     if (params.message && !params.hasDocuments && !params.history) {
-      stream = await BaseQuestionHandler(params.message);
+      // Start Chat, no documents
+      stream = await BaseQuestionHandler(params.message, req.signal);
     } else if (params.message && !params.hasDocuments && params.history) {
-      stream = await ChatHistoryHandler(params.message, params.history);
+      // Chat History, no documents
+      stream = await ChatHistoryHandler(params.message, params.history, req.signal);
     } else if (params.message && params.hasDocuments && !params.history) {
-      stream = await BaseDocumentHandler(params.message, params.roomId);
+      // Start Chat, with documents
+      stream = await BaseDocumentHandler(params.message, params.roomId, req.signal);
     } else if (params.message && params.hasDocuments && params.history) {
-      stream = await ChatDocumentHandler(params.message, params.history, params.roomId);
+      // Chat History, with documents
+      stream = await ChatDocumentHandler(params.message, params.history, params.roomId, req.signal);
     }
     if (stream !== null) {
       logger.info(
         { req, params },
         formatLoggerMessage(PATH, 'Streaming invoked', 'returnResponse')
       );
-      const out = new Response(stream);
-      return out;
+      return new Response(stream);
     }
     const errorMessage = 'Invalid combination of parameters';
     logger.error({ req, params }, formatLoggerMessage(PATH, errorMessage));

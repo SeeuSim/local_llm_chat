@@ -21,9 +21,12 @@ const formatDocsAsString = (docs: Document[]) => {
     .join('\r\n');
 };
 
-export const BaseQuestionHandler = async (question: string) => {
+export const BaseQuestionHandler = async (question: string, signal: AbortSignal) => {
   const prompt = PromptTemplate.fromTemplate(baseTemplate);
+
   const ollama = await ChatOllamaSingleton.getInstance();
+  ollama.CallOptions.signal = signal;
+
   const chain = prompt.pipe(ollama).pipe(new StringOutputParser());
   return chain.stream({ question });
 };
@@ -44,14 +47,19 @@ const formatChatTrain = (chatHistory: Array<TChatMessage>) => {
     .join('\r\n');
 };
 
-export const ChatHistoryHandler = async (question: string, chatHistory: Array<TChatMessage>) => {
+export const ChatHistoryHandler = async (
+  question: string,
+  chatHistory: Array<TChatMessage>,
+  signal: AbortSignal
+) => {
   if (chatHistory.length === 0) {
-    return BaseQuestionHandler(question);
+    return BaseQuestionHandler(question, signal);
   }
 
   const prompt = PromptTemplate.fromTemplate(baseChatHistoryTemplate);
 
   const model = await ChatOllamaSingleton.getInstance();
+  model.CallOptions.signal = signal;
 
   const chain = RunnableSequence.from([
     {
@@ -66,7 +74,11 @@ export const ChatHistoryHandler = async (question: string, chatHistory: Array<TC
   return chain.stream({ question, chat_history: chatHistory });
 };
 
-export const BaseDocumentHandler = async (question: string, roomId: string) => {
+export const BaseDocumentHandler = async (
+  question: string,
+  roomId: string,
+  signal: AbortSignal
+) => {
   const vectorstore = await VectorStore.getInstance();
   const retriever = vectorstore.asRetriever({ filter: { roomId } });
   const retrievalChain = RunnableSequence.from([
@@ -76,6 +88,7 @@ export const BaseDocumentHandler = async (question: string, roomId: string) => {
   ]);
 
   const model = await ChatOllamaSingleton.getInstance();
+  model.CallOptions.signal = signal;
 
   const fullChain = RunnableSequence.from([
     {
@@ -95,11 +108,14 @@ export const BaseDocumentHandler = async (question: string, roomId: string) => {
 export const ChatDocumentHandler = async (
   question: string,
   chatHistory: Array<TChatMessage>,
-  roomId: string
+  roomId: string,
+  signal: AbortSignal
 ) => {
   const vectorstore = await VectorStore.getInstance();
   const retriever = vectorstore.asRetriever({ filter: { roomId } });
+
   const model = await ChatOllamaSingleton.getInstance();
+  model.CallOptions.signal = signal;
 
   const retrievalChain = RunnableSequence.from([
     PromptTemplate.fromTemplate(chatHistoryReflectTemplate),
