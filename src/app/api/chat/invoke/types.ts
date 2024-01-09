@@ -5,7 +5,7 @@ export type TChatMessage = Pick<InferSelectModel<typeof MessagesTable>, 'content
 
 export interface IAPIChatInvokeParams {
   history: Array<TChatMessage>;
-  documents: Array<string>;
+  hasDocuments?: boolean;
   message: string;
   roomId?: string;
 }

@@ -4,6 +4,7 @@ import { PromptTemplate } from 'langchain/prompts';
 import type { Document } from 'langchain/document';
 
 import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
+import VectorStore from '@/lib/models/vectorStore';
 import {
   baseTemplate,
   baseChatHistoryTemplate,
@@ -12,7 +13,6 @@ import {
   chatDocumentQATemplate,
   formatChatHistoryBasePairTemplate,
 } from './templates';
-import VectorStore from '@/lib/models/vectorStore';
 import type { TChatMessage } from './types';
 
 const formatDocsAsString = (docs: Document[]) => {
