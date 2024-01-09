@@ -20,18 +20,100 @@ import { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/create/typ
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 import { useRouter } from 'next/navigation';
+import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { TChatMessage } from '@/app/api/chat/invoke/types';
 
 type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 
 export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className }, ref) => {
   const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
+  const { messages, streamed, setStreamed } = useContext(chatRoomMessagesContext);
   const { push } = useRouter();
   const { toast } = useToast();
 
   const controller = new AbortController();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [files, setFiles] = useState<Array<File>>([]);
+
+  const setStreaming = (val: string, append: boolean = true) => {
+    if (!setStreamed) {
+      return;
+    }
+    if (append) {
+      setStreamed((prev) => prev + val);
+    } else {
+      setStreamed(val);
+    }
+  };
+
+  const invoke = async (
+    message: string,
+    hasDocuments: boolean,
+    previousMessages: TChatMessage[]
+  ) => {
+    resetTextField();
+    setStreaming('<PENDING>', false);
+    const stream = await fetch('/api/chat/invoke', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        history: previousMessages,
+        hasDocuments,
+        roomId,
+      }),
+    });
+
+    const reader = stream.body?.getReader();
+    let accum = '';
+    let isStreamFinished = false;
+    setStreaming('', false);
+    do {
+      if (!reader) {
+        break;
+      }
+      const { done, value } = await reader.read();
+      if (done) {
+        isStreamFinished = true;
+        break;
+      }
+      const chunk = new TextDecoder().decode(value);
+      accum += chunk;
+      setStreaming(chunk);
+    } while (!isStreamFinished);
+
+    const payload: IAPIChatMessagesCreateParams = {
+      messages: [
+        {
+          roomId,
+          persona: 'system',
+          content: accum,
+        },
+      ],
+    };
+
+    const systemMessageInserted = await fetch('/api/chat/messages/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (systemMessageInserted.ok) {
+      queryClient
+        .refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] })
+        .then((_res) => setStreaming('', false))
+        .then((_res) => {
+          if (textAreaRef.current) {
+            textAreaRef.current.focus();
+          }
+        });
+    }
+  };
 
   const keyEventHandler: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     // Handle submit on enter
@@ -110,6 +192,7 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
     onSuccess: () => {
       if (roomId) {
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
+        invoke(textAreaRef.current?.value as string, files.length > 0, messages ?? []);
       }
     },
   });
@@ -138,7 +221,7 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
       if (textAreaRef.current?.value) {
         submitPayload({ payloadRoomId: data.id, message: textAreaRef.current.value, files });
         resetTextField();
-        push(`/chat/${data.id}?invoke=true`);
+        push(`/chat/${data.id}?initial=true`);
       }
     },
   });
@@ -158,7 +241,6 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
       createRoom();
     } else {
       submitPayload({ payloadRoomId: roomId, message: textAreaRef.current.value, files });
-      resetTextField();
     }
   };
 

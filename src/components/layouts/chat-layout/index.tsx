@@ -12,6 +12,7 @@ import type { TMessage } from '@/lib/contexts/chatRoomMessagesContext';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
   const [messages, setMessages] = useState<Array<TMessage>>([]);
+  const [streamed, setStreamed] = useState('');
 
   const appendMessage = (newMessage: TMessage) =>
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -20,7 +21,9 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
     <div className={cn('relative flex min-h-screen flex-col bg-background text-primary')}>
       <NavBar />
       <SideNav />
-      <ChatRoomMessagesProvider {...{ messages, appendMessage, setMessages }}>
+      <ChatRoomMessagesProvider
+        {...{ messages, appendMessage, setMessages, streamed, setStreamed }}
+      >
         <main className='flex-1'>
           <ScrollArea
             id='main-container'

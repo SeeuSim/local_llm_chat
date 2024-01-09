@@ -1,21 +1,24 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import type {
   IAPIChatMessagesGetOutput,
   IAPIChatMessagesGetParams,
 } from '@/app/api/chat/messages/get/types';
 import { useToast } from '@/components/ui/use-toast';
+
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 
 import { ChatMessage } from './ChatMessage';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
-  const { messages, setMessages } = useContext(chatRoomMessagesContext);
+  const { messages, setMessages, streamed } = useContext(chatRoomMessagesContext);
   const { toast } = useToast();
+
+  const streamedRef = useRef<HTMLDivElement>(null);
 
   const {
     data: initialMessages,
@@ -58,15 +61,27 @@ const Room = () => {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (streamed && streamedRef.current) {
+      streamedRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [streamed, streamedRef]);
+
   return messages !== undefined && messages.length > 0 ? (
     <>
-      {messages.map((message, index) => (
+      {messages.map((message) => (
         <ChatMessage
           key={message.id}
           role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
-          content={message.content ?? ''}
+          content={message.content ?? 'EMPTY'}
         />
       ))}
+      {streamed.length > 0 && (
+        <>
+          <ChatMessage role='system' content={streamed} />
+          <div className='h-0 w-0' ref={streamedRef} />
+        </>
+      )}
     </>
   ) : messages !== undefined && messages.length === 0 ? (
     <>

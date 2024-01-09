@@ -8,6 +8,10 @@ export interface IChatRoomMessagesContext {
   messages?: TMessage[];
   setMessages?: React.Dispatch<React.SetStateAction<TMessage[]>>;
   appendMessage?: (newMessage: TMessage) => void;
+  streamed: string;
+  setStreamed?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const chatRoomMessagesContext = React.createContext<IChatRoomMessagesContext>({});
+export const chatRoomMessagesContext = React.createContext<IChatRoomMessagesContext>({
+  streamed: '',
+});
