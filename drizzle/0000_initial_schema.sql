@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "room" (
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "time_index" ON "messages" ("time_stamp");--> statement-breakpoint
 
-CREATE UNIQUE INDEX embeddings_meta_unique ON "embeddings" (("metadata"->>'roomId'),("metadata"->>'title'),("metadata"->>'splitNumber'));--> statement-breakpoint
+CREATE UNIQUE INDEX embeddings_meta_unique ON "embeddings" (("metadata"->>'title'),("metadata"->>'splitNumber'));--> statement-breakpoint
 
 CREATE INDEX IF NOT EXISTS "modifiedIndex" ON "room" ("modifiedTime");--> statement-breakpoint
 DO $$ BEGIN
