@@ -3,7 +3,6 @@ import { formatLoggerMessage, getLogger } from '@/lib/log';
 import {
   getTextChunks,
   processPDFFiles,
-  type TProcessedChunk,
 } from '@/lib/models/embeddings/utils';
 import VectorStoreSingleton from '@/lib/models/vectorStore';
 
@@ -41,34 +40,21 @@ export async function POST(req: Request) {
   // 3. Insert into vector store.
   const vectorStore = await VectorStoreSingleton.getInstance();
   const successfulInserts: string[] = [];
-  const retries: TProcessedChunk[][] = [];
+  const errors: string[] = [];
   for (const currentDocument of chunks) {
     if (currentDocument.length === 0) {
       continue;
     }
-    const { roomId, title } = currentDocument[0].metadata;
+    const { title } = currentDocument[0].metadata;
     try {
       // TODO: Add custom ON CONFLICT sql statement.
       await vectorStore.addDocuments(currentDocument);
-      successfulInserts.push(`${roomId}-${title}`);
+      successfulInserts.push(`${title}`);
     } catch (error) {
-      retries.push(currentDocument);
+      errors.push(currentDocument[0].metadata.title);
     }
   }
-  const errors: any[] = [];
-  for (const duplicateDocument of retries) {
-    if (duplicateDocument.length === 0) {
-      continue;
-    }
-    const { roomId, title } = duplicateDocument[0].metadata;
-    try {
-      await vectorStore.delete({ filter: { roomId, title } });
-      await vectorStore.addDocuments(duplicateDocument);
-      successfulInserts.push(`${roomId}-${title}`);
-    } catch (error) {
-      errors.push([`${roomId}-${title}`, error]);
-    }
-  }
+
   if (errors.length > 0) {
     logger.error(
       {

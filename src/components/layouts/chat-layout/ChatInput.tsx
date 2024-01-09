@@ -283,7 +283,6 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
           ref={textAreaRef}
           className='bg-secondary'
           onKeyDown={keyEventHandler}
-          aria-resize='none'
           disabled={isCreateRoomPending || isSubmitPayloadPending}
         />
       </div>
