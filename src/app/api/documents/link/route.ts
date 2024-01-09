@@ -1,9 +1,14 @@
-import PgInstance from '@/lib/db/dbInstance';
-
-import type { IAPIDocumentsLinkParams } from './types';
 import { sql } from 'drizzle-orm';
 
+import PgInstance from '@/lib/db/dbInstance';
+import { formatLoggerMessage, getLogger } from '@/lib/log';
+
+import type { IAPIDocumentsLinkParams } from './types';
+
+const PATH = 'api/documents/link';
+
 export async function POST(req: Request) {
+  const logger = getLogger(req);
   const params: IAPIDocumentsLinkParams = await req.json();
 
   if (
@@ -12,6 +17,7 @@ export async function POST(req: Request) {
     !params.documentTitles ||
     !Array.isArray(params.documentTitles)
   ) {
+    logger.error({ req, params }, formatLoggerMessage(PATH, 'Invalid parameters'));
     return new Response('Bad request', { status: 400 });
   }
 
@@ -52,7 +58,10 @@ export async function POST(req: Request) {
     }
     return new Response('OK', { status: 200 });
   } catch (error) {
-    console.error(error);
+    logger.error(
+      { req, params, error: { code: 500, message: (error as Error).message } },
+      formatLoggerMessage(PATH, 'An error occurred.')
+    );
     return new Response('BAD', { status: 500 });
   }
 }
