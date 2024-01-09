@@ -1,5 +1,5 @@
 {
-  "id": "c4d44acf-4f40-4ad0-a6f3-8d66b04cbfad",
+  "id": "aad5c7a1-19a7-4030-a185-143c4f9728a4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -89,6 +89,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "document_titles": {
+          "name": "document_titles",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": []
         }
       },
       "indexes": {
@@ -159,7 +166,15 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "modifiedIndex": {
+          "name": "modifiedIndex",
+          "columns": [
+            "modifiedTime"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   forwardRef,
   useContext,
@@ -16,13 +16,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 
+import { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/create/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { useRouter } from 'next/navigation';
 
 type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 
 export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className }, ref) => {
+  const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
+  const { push } = useRouter();
   const { toast } = useToast();
 
   const controller = new AbortController();
@@ -34,45 +38,85 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       event.stopPropagation();
+      onSubmit();
     }
   };
 
-  const {
-    isError,
-    isPending,
-    isSuccess,
-    mutate: submitMessage,
-  } = useMutation({
-    mutationKey: ['chat/file-upload', files],
-    mutationFn: async (roomId: string) => {
-      if (files.length === 0) {
-        return;
+  const { isPending: isSubmitPayloadPending, mutate: submitPayload } = useMutation({
+    mutationKey: ['chat', 'messages', 'create', roomId],
+    mutationFn: async ({
+      payloadRoomId,
+      message,
+      files = [],
+    }: {
+      payloadRoomId: string;
+      message: string;
+      files?: File[];
+    }) => {
+      if (files.length) {
+        const body = new FormData();
+        body.append('roomId', payloadRoomId);
+        files.forEach((file) => body.append('files', file));
+        toast({ title: 'Embedding files...' });
+        const embedResponse = await fetch('/api/embed/documents', {
+          method: 'POST',
+          signal: controller.signal,
+          body,
+        });
+        if (!embedResponse.ok) {
+          const response = await embedResponse.text();
+          throw new Error(response);
+        }
       }
 
-      const payload = new FormData();
-      files.forEach((file) => payload.append('files', file));
+      const filesPayload =
+        files.length > 0
+          ? {
+              documentTitles: files.map((file) => file.name),
+            }
+          : {};
 
-      payload.append('roomId', roomId);
-
-      // payload.append('roomId', 'roomId');
-      return fetch('/api/embed/documents', {
+      const payload: IAPIChatMessagesCreateParams = {
+        messages: [
+          {
+            persona: 'user',
+            content: message,
+            roomId: payloadRoomId,
+            ...filesPayload,
+          },
+        ],
+      };
+      const messageResponse = await fetch('/api/chat/messages/create', {
         method: 'POST',
-        body: payload,
-        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
+
+      if (!messageResponse.ok) {
+        const response = await messageResponse.text();
+        throw new Error(response);
+      }
+      return;
     },
-    onSuccess: () => {},
-    onError(error, _variables, _context) {
+    onError: (error, _variables, _context) => {
       toast({
+        variant: 'destructive',
         title: 'Oh no! An error occurred',
         description: error.message,
-        variant: 'destructive',
-        duration: 2000,
       });
+    },
+    onSuccess: () => {
+      if (roomId) {
+        queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
+      }
     },
   });
 
-  const { mutate: createRoom } = useMutation<Partial<IAPIChatRoomCreateResponse>>({
+  const { isPending: isCreateRoomPending, mutate: createRoom } = useMutation<
+    Partial<IAPIChatRoomCreateResponse>
+  >({
     mutationKey: ['room/create'],
     mutationFn: async () => {
       return fetch('api/chat/room/create', { method: 'POST' }).then((res) => res.json());
@@ -91,9 +135,32 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
         });
         return;
       }
-      submitMessage(data.id);
+      if (textAreaRef.current?.value) {
+        submitPayload({ payloadRoomId: data.id, message: textAreaRef.current.value, files });
+        resetTextField();
+        push(`/chat/${data.id}?invoke=true`);
+      }
     },
   });
+
+  const resetTextField = () => {
+    if (!textAreaRef.current) {
+      return;
+    }
+    textAreaRef.current.value = '';
+  };
+
+  const onSubmit = () => {
+    if (!textAreaRef.current) {
+      return;
+    }
+    if (roomId === '') {
+      createRoom();
+    } else {
+      submitPayload({ payloadRoomId: roomId, message: textAreaRef.current.value, files });
+      resetTextField();
+    }
+  };
 
   return (
     <div
@@ -106,16 +173,25 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
     >
       {/* <FileDialog /> */}
       <div className='flex flex-1 flex-col gap-2'>
-        <Dropzone {...{ blockInteraction: isPending, files, setFiles, fileExtension: 'pdf' }} />
-        <Textarea ref={textAreaRef} className='bg-secondary' onKeyDown={keyEventHandler} />
+        <Dropzone
+          {...{
+            blockInteraction: isCreateRoomPending || isSubmitPayloadPending,
+            files,
+            setFiles,
+            fileExtension: 'pdf',
+          }}
+        />
+        <Textarea
+          ref={textAreaRef}
+          className='bg-secondary'
+          onKeyDown={keyEventHandler}
+          disabled={isCreateRoomPending || isSubmitPayloadPending}
+        />
       </div>
       <Button
         className=''
-        onClick={() => {
-          if (roomId === '') {
-            createRoom();
-          }
-        }}
+        onClick={onSubmit}
+        disabled={isCreateRoomPending || isSubmitPayloadPending}
       >
         <span>Send</span>
       </Button>

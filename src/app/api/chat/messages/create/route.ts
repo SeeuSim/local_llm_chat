@@ -15,8 +15,11 @@ export async function POST(req: Request) {
 
   try {
     const db = await PgInstance.getInstance();
-    await db.insert(MessagesTable).values(params.messages);
-    return new Response(JSON.stringify({ message: 'Insert successful' }), { status: 200 });
+    const messages = await db.insert(MessagesTable).values(params.messages).returning();
+    return new Response(
+      JSON.stringify({ message: 'Insert successful', ids: messages.map((message) => message.id) }),
+      { status: 200 }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ error }), { status: 500 });
   }

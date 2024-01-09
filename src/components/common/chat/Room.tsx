@@ -41,7 +41,7 @@ const Room = () => {
 
   useEffect(() => {
     if (setMessages !== undefined && initialMessages && initialMessages.messages !== undefined) {
-      setMessages((prevMessages) => [...initialMessages.messages, ...prevMessages]);
+      setMessages([...initialMessages.messages]);
     }
   }, [setMessages, initialMessages]);
 

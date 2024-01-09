@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS "modifiedIndex" ON "room" ("modifiedTime");

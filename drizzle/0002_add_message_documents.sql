@@ -1,1 +1,0 @@
-ALTER TABLE "messages" ADD COLUMN "document_titles" text[] DEFAULT array[]::text[];

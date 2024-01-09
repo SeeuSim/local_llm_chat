@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1704670942551,
+      "when": 1704779980068,
       "tag": "0000_initial_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1704683668410,
-      "tag": "0001_add_room_sort_by_modified_time",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1704690625071,
-      "tag": "0002_add_message_documents",
       "breakpoints": true
     }
   ]

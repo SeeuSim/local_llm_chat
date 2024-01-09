@@ -31,11 +31,7 @@ export const ChatMessage = ({ role, content }: IChatMessageProps) => {
         )}
       >
         <CardContent className='flex flex-col gap-2 px-3 py-2'>
-          <span className={cn('prose prose-neutral text-sm')}>
-            {role === 'user'
-              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mollis vulputate ipsum ut aliquam. Quisque blandit purus nec ipsum laoreet aliquet eu ac magna. Vivamus bibendum dictum ligula at dignissim.'
-              : 'Maecenas eget libero et enim laoreet congue eu sed mi. Pellentesque faucibus vel diam id egestas. Integer feugiat vitae odio vel facilisis. Aenean metus justo, varius at tincidunt nec, pharetra dignissim ipsum. Pellentesque nec libero viverra arcu semper laoreet vitae eu est. Suspendisse potenti. Ut enim orci, consectetur iaculis condimentum at, sollicitudin sed nisl. Vivamus congue urna vitae ipsum cursus sodales eget at ipsum. Aliquam dictum velit eu nulla eleifend iaculis.'}
-          </span>
+          <span className={cn('prose prose-neutral text-sm')}>{content}</span>
         </CardContent>
       </Card>
     </div>

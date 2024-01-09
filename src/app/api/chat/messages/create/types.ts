@@ -10,3 +10,8 @@ type TMessagesRequiredFields = WithRequired<
 export interface IAPIChatMessagesCreateParams {
   messages: Array<TMessagesRequiredFields>;
 }
+
+export interface IAPIChatMessagesCreateResponse {
+  message: string;
+  ids: Array<string>;
+}
