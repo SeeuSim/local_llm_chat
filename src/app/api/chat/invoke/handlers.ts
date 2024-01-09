@@ -10,6 +10,7 @@ import {
   chatHistoryReflectTemplate,
   baseDocumentQATemplate,
   chatDocumentQATemplate,
+  formatChatHistoryBasePairTemplate,
 } from './templates';
 import VectorStore from '@/lib/models/vectorStore';
 import type { TChatMessage } from './types';
@@ -34,15 +35,11 @@ const formatChatTrain = (chatHistory: Array<TChatMessage>) => {
         index % 2 === 0 ? [...result, sourceArray.slice(index, index + 2)] : result,
       [] as Array<Array<TChatMessage>>
     )
-    .map(
-      ([userMessage, systemMessage]) => `
-  <s>
-  [INST]
-  ${userMessage.content}
-  [/INST]
-  ${systemMessage.content}
-  </s>
-  `
+    .map(([userMessage, systemMessage]) =>
+      formatChatHistoryBasePairTemplate(
+        userMessage.content as string,
+        systemMessage.content as string
+      )
     )
     .join('\r\n');
 };

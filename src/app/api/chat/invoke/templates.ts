@@ -1,6 +1,22 @@
-export const baseTemplate = `[INST]\r\n{question}\r\n[/INST]`;
+export const baseTemplate = `
+[INST]
+{question}
+[/INST]`.trim();
 
-export const baseChatHistoryTemplate = `{history}\r\n[INST]{question}[/INST]`;
+export const baseChatHistoryTemplate = `
+{history}
+[INST]
+{question}
+[/INST]`.trim();
+
+export const formatChatHistoryBasePairTemplate = (userMessage: string, systemMessage: string) =>
+  `
+<s>
+[INST]
+${userMessage}
+[/INST]
+${systemMessage}
+</s>`.trim();
 
 // QA with documents
 
@@ -53,7 +69,7 @@ export const documentQATemplate =
  * - `question`: The user's question
  */
 export const baseDocumentQATemplate = `<s>
-  ${documentQATemplate}
+${documentQATemplate}
 </s>
 [INST]
 {question}
@@ -66,10 +82,9 @@ export const baseDocumentQATemplate = `<s>
  * - question: The user's question
  */
 export const chatDocumentQATemplate = `<s>
-  ${documentQATemplate}
+${documentQATemplate}
 </s>
 {history}
 [INST]
 {question}
-[/INST]
-`;
+[/INST]`;
