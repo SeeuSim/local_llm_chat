@@ -96,7 +96,7 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
         roomId === id && 'bg-primary text-primary-foreground hover:bg-secondary-foreground'
       )}
     >
-      <div className='flex w-36 flex-row gap-0.5 whitespace-nowrap'>
+      <div className='flex w-28 flex-row gap-0.5 whitespace-nowrap md:w-36'>
         <span className='flex-1 overflow-hidden text-xs font-normal'>{streamedSummary}</span>
         <DropdownMenu>
           <DropdownMenuTrigger className='flex'>
