@@ -69,17 +69,18 @@ const Room = () => {
 
   return messages !== undefined && messages.length > 0 ? (
     <>
-      {messages.map((message) => (
+      {messages.map((message, index) => (
         <ChatMessage
           key={message.id}
           role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
           content={message.content ?? 'EMPTY'}
+          isLast={index === messages.length - 1}
         />
       ))}
       {streamed.length > 0 && (
         <>
-          <ChatMessage role='system' content={streamed} />
-          <div className='h-0 w-0' ref={streamedRef} />
+          <ChatMessage role='system' content={streamed} isStreaming isLast />
+          <div className='h-0 w-0' id='chat-scroll-ref' ref={streamedRef} />
         </>
       )}
     </>

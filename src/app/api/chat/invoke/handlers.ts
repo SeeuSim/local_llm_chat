@@ -25,7 +25,9 @@ export const BaseQuestionHandler = async (question: string, signal: AbortSignal)
   const prompt = PromptTemplate.fromTemplate(baseTemplate);
 
   const ollama = await ChatOllamaSingleton.getInstance();
-  ollama.CallOptions.signal = signal;
+  if (signal) {
+    ollama.CallOptions = { ...(ollama.CallOptions ?? {}), signal };
+  }
 
   const chain = prompt.pipe(ollama).pipe(new StringOutputParser());
   return chain.stream({ question });
@@ -59,7 +61,9 @@ export const ChatHistoryHandler = async (
   const prompt = PromptTemplate.fromTemplate(baseChatHistoryTemplate);
 
   const model = await ChatOllamaSingleton.getInstance();
-  model.CallOptions.signal = signal;
+  if (signal) {
+    model.CallOptions = { ...(model.CallOptions ?? {}), signal };
+  }
 
   const chain = RunnableSequence.from([
     {
@@ -80,7 +84,7 @@ export const BaseDocumentHandler = async (
   signal: AbortSignal
 ) => {
   const vectorstore = await VectorStore.getInstance();
-  const retriever = vectorstore.asRetriever({ filter: { roomId } });
+  const retriever = vectorstore.asRetriever({ filter: { roomKeys: { [roomId]: true } } });
   const retrievalChain = RunnableSequence.from([
     (input) => input.question,
     retriever,
@@ -88,7 +92,9 @@ export const BaseDocumentHandler = async (
   ]);
 
   const model = await ChatOllamaSingleton.getInstance();
-  model.CallOptions.signal = signal;
+  if (signal) {
+    model.CallOptions = { ...(model.CallOptions ?? {}), signal };
+  }
 
   const fullChain = RunnableSequence.from([
     {
@@ -112,10 +118,12 @@ export const ChatDocumentHandler = async (
   signal: AbortSignal
 ) => {
   const vectorstore = await VectorStore.getInstance();
-  const retriever = vectorstore.asRetriever({ filter: { roomId } });
+  const retriever = vectorstore.asRetriever({ filter: { roomKeys: { [roomId]: true } } });
 
   const model = await ChatOllamaSingleton.getInstance();
-  model.CallOptions.signal = signal;
+  if (signal) {
+    // model.CallOptions = { ...model.CallOptions ?? {}, signal };
+  }
 
   const retrievalChain = RunnableSequence.from([
     PromptTemplate.fromTemplate(chatHistoryReflectTemplate),
