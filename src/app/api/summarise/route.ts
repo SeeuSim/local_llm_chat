@@ -1,5 +1,6 @@
+import { formatLoggerMessage, getLogger } from '@/lib/log';
 import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
-import { getStreamingUtils } from '@/lib/streaming';
+import { StringOutputParser } from 'langchain/schema/output_parser';
 import {
   PROMPT_REGEXES,
   PROMPT_SUMMARISATION_TEMPLATES,
@@ -8,7 +9,10 @@ import {
   type TSupportedModel,
 } from './utils';
 
+const PATH = 'api/summarise';
+
 export async function POST(req: Request) {
+  const logger = getLogger(req);
   const body = (await req.json()) as Partial<IAPISummariseInput>;
 
   let modelName: TSupportedModel = 'mistral';
@@ -26,16 +30,16 @@ export async function POST(req: Request) {
   }
   if (body.systemMessage) {
     conversation.push(
-      `Assistant: ${body.systemMessage.replaceAll(PROMPT_REGEXES[modelName], '')}\r\n`
+      `System: ${body.systemMessage.replaceAll(PROMPT_REGEXES[modelName], '')}\r\n`
     );
   }
 
   const SummarisationTemplate = PROMPT_SUMMARISATION_TEMPLATES[modelName](conversation);
 
-  const { stream, callbacks } = getStreamingUtils();
+  logger.info({ req, params: body }, formatLoggerMessage(PATH, 'Invoking summarisation'));
+
   const model = await ChatOllamaSingleton.getInstance();
-  model.callbacks = callbacks;
-  model.invoke(SummarisationTemplate);
+  const stream = await model.pipe(new StringOutputParser()).stream(SummarisationTemplate);
 
   return new Response(stream);
 }

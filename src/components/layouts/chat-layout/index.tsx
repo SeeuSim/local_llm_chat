@@ -18,12 +18,10 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
   return (
-    <div className={cn('relative flex min-h-screen flex-col bg-background text-primary')}>
-      <NavBar />
-      <SideNav />
-      <ChatRoomMessagesProvider
-        {...{ messages, appendMessage, setMessages, streamed, setStreamed }}
-      >
+    <ChatRoomMessagesProvider {...{ messages, appendMessage, setMessages, streamed, setStreamed }}>
+      <div className={cn('relative flex min-h-screen flex-col bg-background text-primary')}>
+        <NavBar />
+        <SideNav />
         <main className='flex-1'>
           <ScrollArea
             id='main-container'
@@ -42,8 +40,8 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
           </ScrollArea>
           <ChatInput />
         </main>
-      </ChatRoomMessagesProvider>
-    </div>
+      </div>
+    </ChatRoomMessagesProvider>
   );
 };
 

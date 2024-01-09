@@ -8,6 +8,7 @@ import {
   useState,
   type HTMLAttributes,
   type KeyboardEventHandler,
+  useEffect,
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import { cn } from '@/lib/utils';
 import { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/create/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 import { TChatMessage } from '@/app/api/chat/invoke/types';
 
@@ -28,7 +29,8 @@ type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className }, ref) => {
   const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
-  const { messages, streamed, setStreamed } = useContext(chatRoomMessagesContext);
+  const searchParams = useSearchParams();
+  const { messages, setStreamed } = useContext(chatRoomMessagesContext);
   const { push } = useRouter();
   const { toast } = useToast();
 
@@ -112,6 +114,9 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
             textAreaRef.current.focus();
           }
         });
+      if (searchParams.get('initial')) {
+        push(`/chat/${roomId}`);
+      }
     }
   };
 
@@ -136,6 +141,7 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
       files?: File[];
     }) => {
       if (files.length) {
+        toast({ title: 'Uploading files...' });
         const body = new FormData();
         body.append('roomId', payloadRoomId);
         files.forEach((file) => body.append('files', file));
@@ -149,6 +155,7 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
           const response = await embedResponse.text();
           throw new Error(response);
         }
+        toast({ title: 'Files uploaded! Submitting to model...' });
       }
 
       const filesPayload =
@@ -243,6 +250,15 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
       submitPayload({ payloadRoomId: roomId, message: textAreaRef.current.value, files });
     }
   };
+
+  useEffect(() => {
+    if (searchParams.get('initial') === 'true' && messages && messages.length) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.persona !== 'system') {
+        invoke(lastMessage.content as string, false, []);
+      }
+    }
+  }, [searchParams.get('initial'), messages]);
 
   return (
     <div
