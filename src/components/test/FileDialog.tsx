@@ -62,7 +62,10 @@ export const FileDialog = () => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger
-        className={cn(buttonVariants({ variant: 'secondary' }), 'inline-flex items-center gap-2')}
+        className={cn(
+          buttonVariants({ variant: 'secondary' }),
+          'inline-flex items-center gap-2 border border-border/40'
+        )}
       >
         <span className='sr-only'>Upload a document</span>
         <UploadIcon className='shrink-0 grow-0' />

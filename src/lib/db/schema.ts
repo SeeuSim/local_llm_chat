@@ -3,10 +3,19 @@ import { index, jsonb, pgTable, primaryKey, text, timestamp, uuid } from 'drizzl
 
 import type { TChunkMetadata } from '@/lib/models/embeddings/utils';
 
-export const RoomTable = pgTable('room', {
-  id: uuid('id').unique().primaryKey().defaultRandom(),
-  summary: text('summary'),
-});
+export const RoomTable = pgTable(
+  'room',
+  {
+    id: uuid('id').unique().primaryKey().defaultRandom(),
+    createdTime: timestamp('createdTime').defaultNow(),
+    // Will have to manually update
+    modifiedTime: timestamp('modifiedTime').defaultNow(),
+    summary: text('summary'),
+  },
+  (table) => ({
+    modifiedIndex: index('modifiedIndex').on(table.modifiedTime).asc(),
+  })
+);
 
 export const MessagesTable = pgTable(
   'messages',
@@ -16,9 +25,10 @@ export const MessagesTable = pgTable(
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-    timeStamp: timestamp('time_stamp'),
+    timeStamp: timestamp('time_stamp').defaultNow(),
     persona: text('persona'),
     content: text('content'),
+    documentTitles: text('document_titles').array().default([]),
   },
   (table) => {
     return {

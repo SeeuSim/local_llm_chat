@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "environment.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/db/migrate.mts"],
+  "include": ["next-env.d.ts", "environment.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/db/migrate.mts", "src/app/sampleWorker.ts"],
   "exclude": ["node_modules"]
 }

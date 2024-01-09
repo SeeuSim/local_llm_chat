@@ -13,6 +13,11 @@ const getVectorStore = () =>
         const embeddings = await HuggingFaceEmbeddingSingleton.getInstance();
         // const embeddings = await OllamaEmbeddingSingleton.getInstance();
         this.instance = await PGVectorStore.initialize(embeddings, PgVectorStoreConfig);
+        // Initialise cleanup on initial
+        process.on('beforeExit', () => {
+          this.instance?.end();
+          this.instance = null;
+        });
       }
       return this.instance;
     }

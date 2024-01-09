@@ -1,5 +1,5 @@
 {
-  "id": "6e43dc4e-109a-4b93-9944-ed8043c617e9",
+  "id": "aad5c7a1-19a7-4030-a185-143c4f9728a4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -75,7 +75,8 @@
           "name": "time_stamp",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "persona": {
           "name": "persona",
@@ -88,6 +89,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "document_titles": {
+          "name": "document_titles",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": []
         }
       },
       "indexes": {
@@ -137,6 +145,20 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "createdTime": {
+          "name": "createdTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "modifiedTime": {
+          "name": "modifiedTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
         "summary": {
           "name": "summary",
           "type": "text",
@@ -144,7 +166,15 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "modifiedIndex": {
+          "name": "modifiedIndex",
+          "columns": [
+            "modifiedTime"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
