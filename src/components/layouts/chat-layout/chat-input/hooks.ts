@@ -247,6 +247,7 @@ export const useChatInputHooks = () => {
     onSuccess: () => {
       if (roomId) {
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
+        // To change messages for when user discards history
         invoke(textAreaRef.current?.value as string, files.length > 0, messages ?? []);
       }
     },
@@ -308,9 +309,10 @@ export const useChatInputHooks = () => {
 
   // For invoking on room creation
   useEffect(() => {
-    if (searchParams.get('initial') === 'true' && messages && messages.length) {
+    if (searchParams.get('initial') === 'true' && messages?.length === 1) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.persona !== 'system') {
+        // No history needed
         invoke(lastMessage.content as string, lastMessage.documentTitles?.length !== 0, []);
       }
     }

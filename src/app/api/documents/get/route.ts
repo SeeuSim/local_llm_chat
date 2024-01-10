@@ -8,7 +8,7 @@ import type { TAPIDocumentsGetParams } from './types';
 
 const PATH = 'api/documents/get';
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   const logger = getLogger(req);
   const params: TAPIDocumentsGetParams = await req.json();
 
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       .from(EmbeddingsTable)
       // TODO: Create a GIN index on the JSONB column to provide
       // better raw `WHERE ->>` performance instead of `jsonb @>` scan
-      .where(sql`${column.name}::jsonb @> ${filterParams}`);
+      .where(sql`metadata @> ${filterParams}::jsonb`);
 
     if (!documentsResponse || !Array.isArray(documentsResponse)) {
       logger.error(

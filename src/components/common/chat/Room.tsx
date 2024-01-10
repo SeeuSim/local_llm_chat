@@ -40,6 +40,7 @@ const Room = () => {
     if (setInvokeParams) {
       setInvokeParams({
         message: lastUserMessage.content as string,
+        // TODO: Add flag for when user discards history
         previousMessages,
         //TODO:CHANGETOROOMHOOK
         hasDocuments: false,
