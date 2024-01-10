@@ -1,17 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
 import { Pencil2Icon } from '@radix-ui/react-icons';
+import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
+import { useContext } from 'react';
+
+import type { IAPIChatRoomGetOutput } from '@/app/api/chat/room/get/types';
 
 import { RoomLink } from '@/components/common/room/RoomLink';
 import { buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 
-import type { IAPIChatRoomGetOutput } from '@/app/api/chat/room/get/types';
-import { useContext } from 'react';
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { cn } from '@/lib/utils';
 
 export const SideNavContent = () => {
   const { roomId } = useContext(roomIDContext);
