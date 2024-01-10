@@ -18,8 +18,10 @@ export async function GET(req: Request) {
 
   const column = EmbeddingsTable.metadata;
 
-  const filterParams: Pick<TChunkMetadata, 'roomId' | 'splitNumber'> = {
-    roomId: params.roomId,
+  const filterParams: Pick<TChunkMetadata, 'roomKeys' | 'splitNumber'> = {
+    roomKeys: {
+      [params.roomId as string]: true,
+    },
     splitNumber: 1,
   };
 

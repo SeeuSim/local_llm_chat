@@ -311,7 +311,7 @@ export const useChatInputHooks = () => {
     if (searchParams.get('initial') === 'true' && messages && messages.length) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.persona !== 'system') {
-        invoke(lastMessage.content as string, false, []);
+        invoke(lastMessage.content as string, lastMessage.documentTitles?.length !== 0, []);
       }
     }
   }, [searchParams.get('initial'), messages]);

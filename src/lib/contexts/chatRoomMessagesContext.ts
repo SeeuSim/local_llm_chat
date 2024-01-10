@@ -6,7 +6,7 @@ import { MessagesTable } from '@/lib/db/schema';
 
 export type TMessage = Pick<
   InferSelectModel<typeof MessagesTable>,
-  'id' | 'content' | 'persona' | 'isAborted' | 'timeStamp'
+  'id' | 'content' | 'persona' | 'isAborted' | 'timeStamp' | 'documentTitles'
 >;
 
 export type TChatInvokeParams = {

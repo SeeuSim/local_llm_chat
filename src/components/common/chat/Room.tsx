@@ -15,8 +15,7 @@ import { ChatMessage } from './ChatMessage';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
-  const { messages, setMessages, streamed, invokeParams, setInvokeParams } =
-    useContext(chatRoomMessagesContext);
+  const { messages, setMessages, streamed, setInvokeParams } = useContext(chatRoomMessagesContext);
   const { toast } = useToast();
 
   const streamedRef = useRef<HTMLDivElement>(null);
@@ -42,6 +41,7 @@ const Room = () => {
       setInvokeParams({
         message: lastUserMessage.content as string,
         previousMessages,
+        //TODO:CHANGETOROOMHOOK
         hasDocuments: false,
         systemMessageId,
       });
