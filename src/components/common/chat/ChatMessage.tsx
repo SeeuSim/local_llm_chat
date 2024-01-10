@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 import { cn } from '@/lib/utils';
+import { STREAM_LOADING_FLAG } from '@/components/layouts/chat-layout/constants';
 
 interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
   role: 'system' | 'user';
@@ -41,7 +42,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
           </div>
           <span className='text-sm font-bold'>{role === 'system' ? 'Model' : 'You'}</span>
         </div>
-        {content === '<PENDING>' ? (
+        {content === STREAM_LOADING_FLAG ? (
           <Skeleton className='ml-5 flex h-20 w-full rounded-md border-border/40' />
         ) : (
           <>
