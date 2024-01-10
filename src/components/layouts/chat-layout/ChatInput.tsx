@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 import { useChatInputHooks } from './chat-input/hooks';
+import { Loader2 } from 'lucide-react';
 
 type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 
@@ -43,7 +44,14 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
               fileExtension: 'pdf',
             }}
           />
-          {loadingStage && <div>{loadingStage}</div>}
+          {loadingStage && (
+            <div className='flex items-center px-2'>
+              <div className='mx-auto flex flex-col justify-items-center gap-2'>
+                <Loader2 className='mx-auto h-5 w-5 animate-spin' />
+                <span className='text-sm font-semibold'>{loadingStage}</span>
+              </div>
+            </div>
+          )}
         </div>
         <Textarea
           ref={textAreaRef}

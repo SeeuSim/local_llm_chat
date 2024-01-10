@@ -15,6 +15,7 @@ import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext'
 
 import { ChatMessage } from './ChatMessage';
 import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Room = () => {
   const searchParams = useSearchParams();
@@ -75,7 +76,12 @@ const Room = () => {
     },
     enabled: roomId !== undefined && roomId.length > 0,
     refetchInterval: (_query) => {
-      if (messages && Array.isArray(messages) && messages.length < 2) {
+      if (
+        searchParams.get('initial') &&
+        messages &&
+        Array.isArray(messages) &&
+        messages.length < 2
+      ) {
         return 500;
       }
     },
@@ -140,15 +146,18 @@ const Room = () => {
       {streamed.length > 0 && <ChatMessage role='system' content={streamed} isStreaming isLast />}
       <div className='h-0 w-full' ref={ref} />
     </>
-  ) : messages !== undefined && messages.length === 0 ? (
-    <>
-      <span>No messages here. Send some!</span>
-    </>
+  ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
+    // Empty Room
+    // TODO: Add hero
+    <span>No messages here. Send some!</span>
   ) : (
     !messages?.length &&
     (isFetching || isPending) && (
       <>
-        <span>Loading...</span>
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
       </>
     )
   );
