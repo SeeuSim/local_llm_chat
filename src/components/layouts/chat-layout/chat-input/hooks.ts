@@ -253,6 +253,7 @@ export const useChatInputHooks = () => {
     },
     onSuccess: () => {
       if (roomId) {
+        queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         // To change messages for when user discards history
         invoke(
@@ -320,7 +321,7 @@ export const useChatInputHooks = () => {
 
   // For invoking on room creation
   useEffect(() => {
-    if (searchParams.get('initial') === 'true' && messages?.length === 1) {
+    if (searchParams.get('initial') === 'true' && messages?.length) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.persona !== 'system') {
         // No history needed
