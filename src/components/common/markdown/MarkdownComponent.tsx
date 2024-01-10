@@ -27,7 +27,7 @@ export const MarkdownComponent = ({
       remarkPlugins={[remarkMath, remarkGfm]}
       className={cn('', className)}
       components={{
-        code({ children, className, node, ...rest }) {
+        code({ children, className, ...rest }) {
           const match = /language-(\w+)/.exec(className || '');
           return match ? (
             <div className='flex flex-col'>
