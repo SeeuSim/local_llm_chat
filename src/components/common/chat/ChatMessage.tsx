@@ -61,9 +61,9 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                 <MarkdownComponent
                   className={cn(
                     'prose prose-neutral text-sm text-primary-foreground',
-                    'prose-a:text-blue-500 prose-code:text-secondary-foreground prose-pre:bg-muted-foreground',
-                    role === 'system' &&
-                      'text-muted-foreground prose-pre:bg-secondary-foreground prose-pre:text-secondary'
+                    'prose-a:text-blue-500 prose-code:text-secondary-foreground prose-pre:ml-2 prose-pre:bg-transparent prose-pre:p-0',
+                    'prose-strong:text-primary',
+                    role === 'system' && 'text-muted-foreground'
                   )}
                 >
                   {content}

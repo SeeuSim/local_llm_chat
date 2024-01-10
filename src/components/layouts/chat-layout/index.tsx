@@ -3,7 +3,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { ChatRoomMessagesProvider } from '@/components/common/chat/providers';
 import {
@@ -22,6 +22,19 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
   const [messages, setMessages] = useState<Array<TMessage>>([]);
   const [streamed, setStreamed] = useState('');
   const [invokeParams, setInvokeParams] = useState<TChatInvokeParams | undefined>(undefined);
+
+  const container = useRef<HTMLDivElement>(null);
+
+  const Scroll = () => {
+    const { offsetHeight, scrollHeight, scrollTop } = container.current as HTMLDivElement;
+    if (scrollHeight <= scrollTop + offsetHeight + 200) {
+      container.current?.scrollTo(0, scrollHeight);
+    }
+  };
+
+  useEffect(() => {
+    Scroll();
+  }, [messages, streamed]);
 
   return (
     <ChatRoomMessagesProvider
@@ -53,7 +66,9 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
               className='h-[62px] w-full bg-primary-foreground'
             />
             <div messageId='main-container-messages' className='p-4'>
-              <div className='mr-4 flex max-w-screen-md flex-col gap-4 lg:mx-auto'>{children}</div>
+              <div ref={container} className='mr-4 flex max-w-screen-md flex-col gap-4 lg:mx-auto'>
+                {children}
+              </div>
             </div>
           </ScrollArea>
           <ChatInput />

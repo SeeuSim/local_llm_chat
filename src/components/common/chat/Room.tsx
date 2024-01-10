@@ -17,11 +17,10 @@ import { ChatMessage } from './ChatMessage';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
+  const ref = useRef<HTMLDivElement>(null);
   const { documents, setDocuments, messages, setMessages, streamed, setInvokeParams } =
     useContext(chatRoomMessagesContext);
   const { toast } = useToast();
-
-  const streamedRef = useRef<HTMLDivElement>(null);
 
   const handleReInvoke = (systemMessageId: string) => {
     if (!messages || messages.length === 0) {
@@ -115,10 +114,8 @@ const Room = () => {
   }, [error]);
 
   useEffect(() => {
-    if (streamed && streamedRef.current) {
-      streamedRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [streamed, streamedRef]);
+    ref.current?.scrollIntoView();
+  }, [messages, streamed]);
 
   return messages !== undefined && messages.length > 0 ? (
     <>
@@ -132,12 +129,8 @@ const Room = () => {
           reInvoke={() => handleReInvoke(message.id as string)}
         />
       ))}
-      {streamed.length > 0 && (
-        <>
-          <ChatMessage role='system' content={streamed} isStreaming isLast />
-          <div className='h-0 w-0' messageId='chat-scroll-ref' ref={streamedRef} />
-        </>
-      )}
+      {streamed.length > 0 && <ChatMessage role='system' content={streamed} isStreaming isLast />}
+      <div className='h-0 w-full' ref={ref} />
     </>
   ) : messages !== undefined && messages.length === 0 ? (
     <>
