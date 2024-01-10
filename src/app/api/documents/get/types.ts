@@ -1,4 +1,7 @@
-
-export type TAPIDocumentsGetParams = {
+export interface IAPIDocumentsGetParams {
   roomId: string;
-};
+}
+
+export interface IAPIDocumentsGetResults {
+  documents: string[];
+}

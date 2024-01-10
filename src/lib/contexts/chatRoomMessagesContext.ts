@@ -4,6 +4,8 @@ import React, { MutableRefObject } from 'react';
 import type { TChatMessage } from '@/app/api/chat/invoke/types';
 import { MessagesTable } from '@/lib/db/schema';
 
+export type TDocument = string;
+
 export type TMessage = Pick<
   InferSelectModel<typeof MessagesTable>,
   'id' | 'content' | 'persona' | 'isAborted' | 'timeStamp' | 'documentTitles'
@@ -17,9 +19,13 @@ export type TChatInvokeParams = {
 };
 
 export interface IChatRoomMessagesContext {
+  // Room State
+  documents?: TDocument[];
+  setDocuments?: React.Dispatch<React.SetStateAction<TDocument[]>>;
   messages?: TMessage[];
   setMessages?: React.Dispatch<React.SetStateAction<TMessage[]>>;
-  appendMessage?: (newMessage: TMessage) => void;
+
+  // Dynamic Streaming
   streamed: string;
   setStreamed?: React.Dispatch<React.SetStateAction<string>>;
   invokeController?: MutableRefObject<AbortController>;

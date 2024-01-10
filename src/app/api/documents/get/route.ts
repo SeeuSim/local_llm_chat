@@ -4,13 +4,13 @@ import PgInstance from '@/lib/db/dbInstance';
 import { EmbeddingsTable } from '@/lib/db/schema';
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 import type { TChunkMetadata } from '@/lib/models/embeddings/utils';
-import type { TAPIDocumentsGetParams } from './types';
+import type { IAPIDocumentsGetParams, IAPIDocumentsGetResults } from './types';
 
 const PATH = 'api/documents/get';
 
 export async function POST(req: Request) {
   const logger = getLogger(req);
-  const params: TAPIDocumentsGetParams = await req.json();
+  const params: IAPIDocumentsGetParams = await req.json();
 
   if (!params || !params.roomId) {
     return new Response(JSON.stringify({}), { status: 400 });
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       .map((document) => document.metadata?.title)
       .filter((v) => v) as string[];
 
-    const output = { documents: uniqueTitles };
+    const output: IAPIDocumentsGetResults = { documents: uniqueTitles };
     return new Response(JSON.stringify(output), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error }), { status: 500 });

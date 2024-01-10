@@ -19,8 +19,15 @@ export const useChatInputHooks = () => {
 
   const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
-  const { invokeController, messages, streamed, setStreamed, invokeParams, setInvokeParams } =
-    useContext(chatRoomMessagesContext);
+  const {
+    invokeController,
+    documents,
+    messages,
+    streamed,
+    setStreamed,
+    invokeParams,
+    setInvokeParams,
+  } = useContext(chatRoomMessagesContext);
 
   const { toast } = useToast();
 
@@ -248,7 +255,11 @@ export const useChatInputHooks = () => {
       if (roomId) {
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         // To change messages for when user discards history
-        invoke(textAreaRef.current?.value as string, files.length > 0, messages ?? []);
+        invoke(
+          textAreaRef.current?.value as string,
+          documents !== undefined && documents.length > 0,
+          messages ?? []
+        );
       }
     },
   });

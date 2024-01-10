@@ -6,7 +6,11 @@ import { cn } from '@/lib/utils';
 import { useRef, useState } from 'react';
 
 import { ChatRoomMessagesProvider } from '@/components/common/chat/providers';
-import type { TChatInvokeParams, TMessage } from '@/lib/contexts/chatRoomMessagesContext';
+import {
+  type TChatInvokeParams,
+  type TDocument,
+  type TMessage,
+} from '@/lib/contexts/chatRoomMessagesContext';
 
 import { ChatInput } from './ChatInput';
 import { NavBar } from './NavBar';
@@ -14,18 +18,17 @@ import { SideNav } from './SideNav';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
   const invokeController = useRef(new AbortController());
+  const [documents, setDocuments] = useState<Array<TDocument>>([]);
   const [messages, setMessages] = useState<Array<TMessage>>([]);
   const [streamed, setStreamed] = useState('');
   const [invokeParams, setInvokeParams] = useState<TChatInvokeParams | undefined>(undefined);
 
-  const appendMessage = (newMessage: TMessage) =>
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-
   return (
     <ChatRoomMessagesProvider
       {...{
+        documents,
+        setDocuments,
         messages,
-        appendMessage,
         setMessages,
         streamed,
         setStreamed,
