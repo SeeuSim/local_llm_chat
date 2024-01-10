@@ -39,6 +39,7 @@ export async function POST(req: Request) {
   logger.info({ req, params: body }, formatLoggerMessage(PATH, 'Invoking summarisation'));
 
   const model = await ChatOllamaSingleton.getInstance();
+  model.CallOptions.signal = req.signal;
   const stream = await model.pipe(new StringOutputParser()).stream(SummarisationTemplate);
 
   return new Response(stream);

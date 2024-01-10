@@ -6,11 +6,12 @@ import { cn } from '@/lib/utils';
 import { ChatInput } from './ChatInput';
 import { NavBar } from './NavBar';
 import { SideNav } from './SideNav';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ChatRoomMessagesProvider } from '@/components/common/chat/providers';
 import type { TMessage } from '@/lib/contexts/chatRoomMessagesContext';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
+  const invokeController = useRef(new AbortController());
   const [messages, setMessages] = useState<Array<TMessage>>([]);
   const [streamed, setStreamed] = useState('');
 
@@ -18,7 +19,9 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
   return (
-    <ChatRoomMessagesProvider {...{ messages, appendMessage, setMessages, streamed, setStreamed }}>
+    <ChatRoomMessagesProvider
+      {...{ messages, appendMessage, setMessages, streamed, setStreamed, invokeController }}
+    >
       <div className={cn('relative flex min-h-screen flex-col bg-background text-primary')}>
         <NavBar />
         <SideNav />

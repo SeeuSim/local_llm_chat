@@ -65,6 +65,10 @@
     --ring: 0 0% 83.1%;
   }
 }
+
+.prose pre code {
+  color: hsl(var(--muted));
+}
  
 @layer base {
   * {

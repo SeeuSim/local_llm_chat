@@ -30,7 +30,7 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
   const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
   const searchParams = useSearchParams();
-  const { messages, setStreamed } = useContext(chatRoomMessagesContext);
+  const { invokeController, messages, setStreamed } = useContext(chatRoomMessagesContext);
   const { push } = useRouter();
   const { toast } = useToast();
 
@@ -49,50 +49,13 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
     }
   };
 
-  const invoke = async (
-    message: string,
-    hasDocuments: boolean,
-    previousMessages: TChatMessage[]
-  ) => {
-    resetTextField();
-    setStreaming('<PENDING>', false);
-    const stream = await fetch('/api/chat/invoke', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        history: previousMessages,
-        hasDocuments,
-        roomId,
-      }),
-    });
-
-    const reader = stream.body?.getReader();
-    let accum = '';
-    let isStreamFinished = false;
-    setStreaming('', false);
-    do {
-      if (!reader) {
-        break;
-      }
-      const { done, value } = await reader.read();
-      if (done) {
-        isStreamFinished = true;
-        break;
-      }
-      const chunk = new TextDecoder().decode(value);
-      accum += chunk;
-      setStreaming(chunk);
-    } while (!isStreamFinished);
-
+  const insertSystemMessage = async (message: string) => {
     const payload: IAPIChatMessagesCreateParams = {
       messages: [
         {
           roomId,
           persona: 'system',
-          content: accum,
+          content: message,
         },
       ],
     };
@@ -113,11 +76,73 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
           if (textAreaRef.current) {
             textAreaRef.current.focus();
           }
+          if (invokeController) {
+            invokeController.current = new AbortController();
+          }
         });
       if (searchParams.get('initial')) {
         push(`/chat/${roomId}`);
       }
     }
+  };
+
+  const invoke = async (
+    message: string,
+    hasDocuments: boolean,
+    previousMessages: TChatMessage[]
+  ) => {
+    resetTextField();
+    setStreaming('<PENDING>', false);
+    const signal = invokeController?.current?.signal
+      ? { signal: invokeController.current.signal }
+      : {};
+    const stream = await fetch('/api/chat/invoke', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...signal,
+      body: JSON.stringify({
+        message,
+        history: previousMessages,
+        hasDocuments,
+        roomId,
+      }),
+    });
+
+    const reader = stream?.body?.getReader();
+    let isStreamFinished = false;
+    if (invokeController?.current && reader) {
+      invokeController.current = new AbortController();
+      invokeController.current.signal.addEventListener(
+        'abort',
+        () => {
+          reader.cancel();
+          isStreamFinished = true;
+          if (invokeController) {
+            invokeController.current = new AbortController();
+          }
+        },
+        { signal: invokeController.current.signal }
+      );
+    }
+
+    let accum = '';
+    setStreaming(accum, false);
+    do {
+      if (!reader) {
+        break;
+      }
+      const { done, value } = await reader.read();
+      if (done || invokeController?.current.signal.aborted) {
+        isStreamFinished = true;
+        break;
+      }
+      const chunk = new TextDecoder().decode(value);
+      accum += chunk;
+      setStreaming(chunk);
+    } while (!isStreamFinished);
+    await insertSystemMessage(accum);
   };
 
   const keyEventHandler: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {

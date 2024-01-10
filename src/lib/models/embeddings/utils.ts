@@ -3,10 +3,12 @@ import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
 type TMetadata = {
-  roomId: string;
   title: string;
   fileType: string;
   totalPages: number;
+  roomKeys: {
+    [key: string]: boolean;
+  };
 };
 
 export type TChunkMetadata = Omit<TMetadata, 'totalPages'> & { splitNumber: number };
@@ -31,10 +33,12 @@ export const processPDFFiles: (
           docs.map((doc) => ({
             ...doc,
             metadata: {
-              roomId,
               title: file.name,
               fileType: file.type,
               totalPages: doc['metadata']['pdf']['totalPages'],
+              roomKeys: {
+                [roomId]: true,
+              },
             },
           }))
         )
@@ -58,10 +62,10 @@ export const getTextChunks: (
         splits.map((split, index) => ({
           ...split,
           metadata: {
-            roomId: document.metadata.roomId,
             title: document.metadata.title,
             fileType: document.metadata.fileType,
             splitNumber: index + 1,
+            roomKeys: document.metadata.roomKeys,
           },
         }))
       )
