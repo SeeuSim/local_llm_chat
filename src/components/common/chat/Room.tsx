@@ -14,8 +14,10 @@ import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 
 import { ChatMessage } from './ChatMessage';
+import { useSearchParams } from 'next/navigation';
 
 const Room = () => {
+  const searchParams = useSearchParams();
   const { roomId } = useContext(roomIDContext);
   const ref = useRef<HTMLDivElement>(null);
   const { documents, setDocuments, messages, setMessages, streamed, setInvokeParams } =
@@ -52,11 +54,12 @@ const Room = () => {
   };
 
   const {
-    data: initialMessages,
+    data: messagePayload,
     isFetching,
+    isPending,
     error,
   } = useQuery<IAPIChatMessagesGetOutput, Error>({
-    queryKey: ['chat', 'messages', 'get', roomId],
+    queryKey: ['chat', 'messages', 'get', roomId, searchParams.get('initial')],
     queryFn: async ({ signal }) => {
       const payload: IAPIChatMessagesGetParams = {
         roomId,
@@ -71,6 +74,11 @@ const Room = () => {
       }).then((res) => res.json());
     },
     enabled: roomId !== undefined && roomId.length > 0,
+    refetchInterval: (_query) => {
+      if (messages && Array.isArray(messages) && messages.length < 2) {
+        return 500;
+      }
+    },
   });
 
   const { data: roomDocuments } = useQuery<IAPIDocumentsGetResults>({
@@ -95,10 +103,10 @@ const Room = () => {
   }, [setDocuments, roomDocuments]);
 
   useEffect(() => {
-    if (setMessages !== undefined && initialMessages && initialMessages.messages !== undefined) {
-      setMessages([...initialMessages.messages]);
+    if (setMessages !== undefined && messagePayload && messagePayload.messages !== undefined) {
+      setMessages([...messagePayload.messages]);
     }
-  }, [setMessages, initialMessages]);
+  }, [setMessages, messagePayload]);
 
   useEffect(() => {
     if (error !== null) {
@@ -137,8 +145,8 @@ const Room = () => {
       <span>No messages here. Send some!</span>
     </>
   ) : (
-    messages === undefined &&
-    isFetching && (
+    !messages?.length &&
+    (isFetching || isPending) && (
       <>
         <span>Loading...</span>
       </>

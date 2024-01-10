@@ -9,6 +9,7 @@ const getOllamaSingleton = () =>
         this.instance = new ChatOllama({
           baseUrl: process.env.OLLAMA_BASE_URL,
           model: this.model,
+          numCtx: 32678,
         });
       }
       return this.instance;

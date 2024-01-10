@@ -34,6 +34,7 @@ export const useChatInputHooks = () => {
   const controller = new AbortController();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [files, setFiles] = useState<Array<File>>([]);
+  const [loadingStage, setLoadingStage] = useState('');
 
   const setStreaming = (val: string, options?: { append: boolean }) => {
     if (!setStreamed) {
@@ -87,12 +88,10 @@ export const useChatInputHooks = () => {
         .refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] })
         .then((_res) => setStreaming(RESET_STREAM))
         .then((_res) => {
-          if (textAreaRef.current) {
-            textAreaRef.current.focus();
-          }
           if (invokeController) {
             invokeController.current = new AbortController();
           }
+          textAreaRef.current?.focus();
         });
       if (searchParams.get('initial')) {
         push(`/chat/${roomId}`);
@@ -196,7 +195,7 @@ export const useChatInputHooks = () => {
       files?: File[];
     }) => {
       if (files.length) {
-        toast({ title: 'Uploading files...' });
+        setLoadingStage('Uploading files...');
         const body = new FormData();
         body.append('roomId', payloadRoomId);
         files.forEach((file) => body.append('files', file));
@@ -206,6 +205,7 @@ export const useChatInputHooks = () => {
           signal: controller.signal,
           body,
         });
+        setLoadingStage('Files Uploaded.');
         if (!embedResponse.ok) {
           const response = await embedResponse.text();
           throw new Error(response);
@@ -230,6 +230,7 @@ export const useChatInputHooks = () => {
           },
         ],
       };
+      setLoadingStage('Sending message...');
       const messageResponse = await fetch('/api/chat/messages/create', {
         method: 'POST',
         headers: {
@@ -237,6 +238,7 @@ export const useChatInputHooks = () => {
         },
         body: JSON.stringify(payload),
       });
+      setLoadingStage('');
 
       if (!messageResponse.ok) {
         const response = await messageResponse.text();
@@ -345,6 +347,7 @@ export const useChatInputHooks = () => {
 
   return {
     isInputsDisabled,
+    loadingStage,
     files,
     setFiles,
     textAreaRef,
