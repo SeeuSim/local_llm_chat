@@ -15,10 +15,38 @@ import { ChatMessage } from './ChatMessage';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
-  const { messages, setMessages, streamed } = useContext(chatRoomMessagesContext);
+  const { messages, setMessages, streamed, invokeParams, setInvokeParams } =
+    useContext(chatRoomMessagesContext);
   const { toast } = useToast();
 
   const streamedRef = useRef<HTMLDivElement>(null);
+
+  const handleReInvoke = (systemMessageId: string) => {
+    if (!messages || messages.length === 0) {
+      return;
+    }
+    let index = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].persona === 'user') {
+        index = i;
+        break;
+      }
+    }
+    if (index < 0) {
+      return;
+    }
+
+    const lastUserMessage = messages[index];
+    const previousMessages = index > 0 ? messages.slice(0, index) : [];
+    if (setInvokeParams) {
+      setInvokeParams({
+        message: lastUserMessage.content as string,
+        previousMessages,
+        hasDocuments: false,
+        systemMessageId,
+      });
+    }
+  };
 
   const {
     data: initialMessages,
@@ -75,12 +103,14 @@ const Room = () => {
           role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
           content={message.content ?? 'EMPTY'}
           isLast={index === messages.length - 1}
+          isAborted={message.isAborted ?? false}
+          reInvoke={() => handleReInvoke(message.id as string)}
         />
       ))}
       {streamed.length > 0 && (
         <>
           <ChatMessage role='system' content={streamed} isStreaming isLast />
-          <div className='h-0 w-0' id='chat-scroll-ref' ref={streamedRef} />
+          <div className='h-0 w-0' messageId='chat-scroll-ref' ref={streamedRef} />
         </>
       )}
     </>

@@ -40,11 +40,11 @@ type Action =
     }
   | {
       type: ActionType['DISMISS_TOAST'];
-      toastId?: ToasterToast['id'];
+      toastId?: ToasterToast['messageId'];
     }
   | {
       type: ActionType['REMOVE_TOAST'];
-      toastId?: ToasterToast['id'];
+      toastId?: ToasterToast['messageId'];
     };
 
 interface State {
@@ -80,7 +80,9 @@ export const reducer = (state: State, action: Action): State => {
     case 'UPDATE_TOAST':
       return {
         ...state,
-        toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
+        toasts: state.toasts.map((t) =>
+          t.messageId === action.toast.messageId ? { ...t, ...action.toast } : t
+        ),
       };
 
     case 'DISMISS_TOAST': {
@@ -92,14 +94,14 @@ export const reducer = (state: State, action: Action): State => {
         addToRemoveQueue(toastId);
       } else {
         state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
+          addToRemoveQueue(toast.messageId);
         });
       }
 
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
+          t.messageId === toastId || toastId === undefined
             ? {
                 ...t,
                 open: false,
@@ -117,7 +119,7 @@ export const reducer = (state: State, action: Action): State => {
       }
       return {
         ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
+        toasts: state.toasts.filter((t) => t.messageId !== action.toastId),
       };
   }
 };
@@ -141,7 +143,7 @@ function toast({ ...props }: Toast) {
   const update = (props: ToasterToast) =>
     dispatch({
       type: 'UPDATE_TOAST',
-      toast: { ...props, id },
+      toast: { ...props, messageId: id },
     });
   const dismiss = () => dispatch({ type: 'DISMISS_TOAST', toastId: id });
 
@@ -149,7 +151,7 @@ function toast({ ...props }: Toast) {
     type: 'ADD_TOAST',
     toast: {
       ...props,
-      id,
+      messageId: id,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss();

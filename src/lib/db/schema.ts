@@ -1,5 +1,14 @@
 import { customVector } from '@useverk/drizzle-pgvector';
-import { index, jsonb, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import type { TChunkMetadata } from '@/lib/models/embeddings/utils';
 
@@ -13,7 +22,7 @@ export const RoomTable = pgTable(
     summary: text('summary'),
   },
   (table) => ({
-    modifiedIndex: index('modifiedIndex').on(table.modifiedTime).asc(),
+    modifiedIndex: index('modifiedIndex').on(table.modifiedTime).desc(),
   })
 );
 
@@ -29,6 +38,7 @@ export const MessagesTable = pgTable(
     persona: text('persona'),
     content: text('content'),
     documentTitles: text('document_titles').array().default([]),
+    isAborted: boolean('is_aborted').default(false),
   },
   (table) => {
     return {

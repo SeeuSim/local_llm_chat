@@ -1,28 +1,35 @@
 'use client';
 
 import { FaceIcon, PersonIcon, ReloadIcon, StopIcon } from '@radix-ui/react-icons';
+import { HTMLAttributes, forwardRef, useContext, useState } from 'react';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { forwardRef, HTMLAttributes, useContext } from 'react';
-import { MarkdownComponent } from '../markdown/MarkdownComponent';
+import { MarkdownComponent } from '@/components/common/markdown/MarkdownComponent';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { cn } from '@/lib/utils';
 
 interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
   role: 'system' | 'user';
   content: string;
   isStreaming?: boolean;
   isLast?: boolean;
+  isAborted?: boolean;
+  reInvoke?: () => void;
 }
 
 export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
-  ({ role, content, isStreaming, isLast }: IChatMessageProps, ref) => {
-    const { invokeController } = useContext(chatRoomMessagesContext);
+  ({ role, content, isStreaming, isLast, isAborted, reInvoke }: IChatMessageProps, ref) => {
+    const { invokeController, streamed } = useContext(chatRoomMessagesContext);
+    const [onReinvokeHide, setOnReinvokeHide] = useState(false);
 
     return (
-      <div ref={ref} className={cn('flex flex-col')}>
+      <div
+        ref={ref}
+        className={cn('flex flex-col', onReinvokeHide && streamed.length > 0 && 'hidden')}
+      >
         <div className={cn('mb-1 flex flex-row items-center gap-2')}>
           <div
             className={cn(
@@ -44,7 +51,12 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                 role === 'system' && 'border-border/40 bg-muted'
               )}
             >
-              <CardContent className='flex flex-col gap-2 px-3 py-2'>
+              <CardContent className='relative flex w-full flex-col gap-2 px-3 py-2'>
+                {isAborted && (
+                  <div className='absolute right-2 top-2 ml-auto rounded-full bg-muted-foreground px-2 py-1 text-xs text-muted'>
+                    Interrupted
+                  </div>
+                )}
                 <MarkdownComponent
                   className={cn(
                     'prose prose-neutral text-sm text-primary-foreground',
@@ -79,12 +91,18 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                     <StopIcon className='hover:fill-current' />
                   </Button>
                 )}
-                <Button
-                  disabled={isStreaming}
-                  className='h-min rounded-md bg-transparent p-2 text-primary shadow-none hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed'
-                >
-                  <ReloadIcon />
-                </Button>
+                {isAborted && (
+                  <Button
+                    disabled={isStreaming}
+                    onClick={() => {
+                      reInvoke && reInvoke();
+                      setOnReinvokeHide(true);
+                    }}
+                    className='h-min rounded-md bg-transparent p-2 text-primary shadow-none hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed'
+                  >
+                    <ReloadIcon />
+                  </Button>
+                )}
               </div>
             )}
           </>

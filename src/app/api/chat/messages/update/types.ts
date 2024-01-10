@@ -5,14 +5,14 @@ import type { WithRequired } from '@/lib/types';
 
 type TMessagesRequiredFields = WithRequired<
   InferInsertModel<typeof MessagesTable>,
-  'roomId' | 'persona' | 'content'
+  'roomId' | 'content' | 'id'
 >;
 
-export interface IAPIChatMessagesCreateParams {
+export interface IAPIChatMessagesUpdateParams {
   messages: Array<TMessagesRequiredFields>;
 }
 
-export interface IAPIChatMessagesCreateResponse {
+export interface IAPIChatMessagesUpdateResponse {
   message: string;
   ids: Array<string>;
 }
