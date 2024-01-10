@@ -55,7 +55,7 @@ export const processPDFFiles: (
 export const getTextChunks: (
   documents: Array<TProcessedDocument>
 ) => Promise<Array<Array<TProcessedChunk>>> = async (documents) => {
-  const splitter = new RecursiveCharacterTextSplitter({ chunkOverlap: 150, chunkSize: 1500 });
+  const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 500, chunkOverlap: 50 });
   const splits = await Promise.all(
     documents.map((document) =>
       splitter.splitDocuments([document]).then((splits) =>

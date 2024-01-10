@@ -10,13 +10,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 import type { IAPIChatRoomGetOutput } from '@/app/api/chat/room/get/types';
+import { useContext } from 'react';
+import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 
 export const SideNavContent = () => {
+  const { roomId } = useContext(roomIDContext);
   const { data: roomData } = useQuery<IAPIChatRoomGetOutput, Error>({
-    queryKey: ['chat', 'rooms', 'get'],
+    queryKey: ['chat', 'rooms', 'get', roomId],
     queryFn: async ({ signal }) => {
       return fetch('/api/chat/room/get', {
         method: 'POST',
+        signal,
       }).then((res) => res.json());
     },
   });

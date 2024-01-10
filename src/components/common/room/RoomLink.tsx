@@ -78,8 +78,11 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
   };
 
   useEffect(() => {
-    if (roomId === id && messages && messages.length === 2 && !summary) {
-      const [first, second] = messages;
+    if (roomId === id && messages && messages.length && !summary) {
+      if (messages.length < 2) {
+        return;
+      }
+      const [first, second] = messages.slice(0, 2);
       if (first.persona === 'user' && second.persona === 'system') {
         invoke(first.content as string, second.content as string);
       }

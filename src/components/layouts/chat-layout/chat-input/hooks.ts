@@ -2,15 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useMemo, useRef, useState, type KeyboardEventHandler } from 'react';
 
+import { RESET_STREAM, STREAM_LOADING_FLAG } from '@/components/layouts/chat-layout/constants';
 import { useToast } from '@/components/ui/use-toast';
 
 import type { TChatMessage } from '@/app/api/chat/invoke/types';
 import type { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/create/types';
+import { IAPIChatMessagesUpdateParams } from '@/app/api/chat/messages/update/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
-import { IAPIChatMessagesUpdateParams } from '@/app/api/chat/messages/update/types';
 
 export const useChatInputHooks = () => {
   const { push } = useRouter();
@@ -18,8 +19,15 @@ export const useChatInputHooks = () => {
 
   const queryClient = useQueryClient();
   const { roomId } = useContext(roomIDContext);
-  const { invokeController, messages, streamed, setStreamed, invokeParams, setInvokeParams } =
-    useContext(chatRoomMessagesContext);
+  const {
+    invokeController,
+    documents,
+    messages,
+    streamed,
+    setStreamed,
+    invokeParams,
+    setInvokeParams,
+  } = useContext(chatRoomMessagesContext);
 
   const { toast } = useToast();
 
@@ -27,11 +35,11 @@ export const useChatInputHooks = () => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [files, setFiles] = useState<Array<File>>([]);
 
-  const setStreaming = (val: string, append: boolean = true) => {
+  const setStreaming = (val: string, options?: { append: boolean }) => {
     if (!setStreamed) {
       return;
     }
-    if (append) {
+    if (options?.append) {
       setStreamed((prev) => prev + val);
     } else {
       setStreamed(val);
@@ -77,7 +85,7 @@ export const useChatInputHooks = () => {
     if (upsertResponse.ok) {
       queryClient
         .refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] })
-        .then((_res) => setStreaming('', false))
+        .then((_res) => setStreaming(RESET_STREAM))
         .then((_res) => {
           if (textAreaRef.current) {
             textAreaRef.current.focus();
@@ -104,7 +112,7 @@ export const useChatInputHooks = () => {
     systemMessageId?: string
   ) => {
     resetTextField();
-    setStreaming('<PENDING>', false);
+    setStreaming(STREAM_LOADING_FLAG);
     const signal = invokeController?.current?.signal
       ? { signal: invokeController.current.signal }
       : {};
@@ -141,7 +149,7 @@ export const useChatInputHooks = () => {
     }
 
     let accum = '';
-    setStreaming(accum, false);
+    setStreaming(accum);
     do {
       if (!reader) {
         break;
@@ -156,7 +164,7 @@ export const useChatInputHooks = () => {
       }
       const chunk = new TextDecoder().decode(value);
       accum += chunk;
-      setStreaming(chunk);
+      setStreaming(chunk, { append: true });
     } while (!isStreamFinished);
     await upsertSystemMessage(accum, isAborted, systemMessageId);
   };
@@ -245,8 +253,14 @@ export const useChatInputHooks = () => {
     },
     onSuccess: () => {
       if (roomId) {
+        queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        invoke(textAreaRef.current?.value as string, files.length > 0, messages ?? []);
+        // To change messages for when user discards history
+        invoke(
+          textAreaRef.current?.value as string,
+          documents !== undefined && documents.length > 0,
+          messages ?? []
+        );
       }
     },
   });
@@ -307,10 +321,11 @@ export const useChatInputHooks = () => {
 
   // For invoking on room creation
   useEffect(() => {
-    if (searchParams.get('initial') === 'true' && messages && messages.length) {
+    if (searchParams.get('initial') === 'true' && messages?.length) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.persona !== 'system') {
-        invoke(lastMessage.content as string, false, []);
+        // No history needed
+        invoke(lastMessage.content as string, lastMessage.documentTitles?.length !== 0, []);
       }
     }
   }, [searchParams.get('initial'), messages]);

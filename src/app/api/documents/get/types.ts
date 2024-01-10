@@ -1,3 +1,7 @@
-import type { TChunkMetadata } from '@/lib/models/embeddings/utils';
+export interface IAPIDocumentsGetParams {
+  roomId: string;
+}
 
-export type TAPIDocumentsGetParams = Pick<TChunkMetadata, 'roomId'>;
+export interface IAPIDocumentsGetResults {
+  documents: string[];
+}

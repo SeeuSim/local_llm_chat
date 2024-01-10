@@ -6,6 +6,8 @@ import type {
   IAPIChatMessagesGetOutput,
   IAPIChatMessagesGetParams,
 } from '@/app/api/chat/messages/get/types';
+import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
+
 import { useToast } from '@/components/ui/use-toast';
 
 import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
@@ -15,7 +17,7 @@ import { ChatMessage } from './ChatMessage';
 
 const Room = () => {
   const { roomId } = useContext(roomIDContext);
-  const { messages, setMessages, streamed, invokeParams, setInvokeParams } =
+  const { documents, setDocuments, messages, setMessages, streamed, setInvokeParams } =
     useContext(chatRoomMessagesContext);
   const { toast } = useToast();
 
@@ -41,8 +43,10 @@ const Room = () => {
     if (setInvokeParams) {
       setInvokeParams({
         message: lastUserMessage.content as string,
+        // TODO: Add flag for when user discards history
         previousMessages,
-        hasDocuments: false,
+        //TODO:CHANGETOROOMHOOK
+        hasDocuments: documents !== undefined && documents.length > 0,
         systemMessageId,
       });
     }
@@ -69,6 +73,27 @@ const Room = () => {
     },
     enabled: roomId !== undefined && roomId.length > 0,
   });
+
+  const { data: roomDocuments } = useQuery<IAPIDocumentsGetResults>({
+    queryKey: ['chat', 'documents', 'get', roomId],
+    queryFn: async ({ signal }) => {
+      const payload = { roomId };
+      return await fetch('/api/documents/get', {
+        signal,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }).then((res) => res.json());
+    },
+  });
+
+  useEffect(() => {
+    if (setDocuments && roomDocuments !== undefined && Array.isArray(roomDocuments.documents)) {
+      setDocuments(roomDocuments.documents);
+    }
+  }, [setDocuments, roomDocuments]);
 
   useEffect(() => {
     if (setMessages !== undefined && initialMessages && initialMessages.messages !== undefined) {
