@@ -5,9 +5,10 @@ import { FaceIcon, PersonIcon, ReloadIcon, StopIcon } from '@radix-ui/react-icon
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { forwardRef, HTMLAttributes } from 'react';
+import { forwardRef, HTMLAttributes, useContext } from 'react';
 import { MarkdownComponent } from '../markdown/MarkdownComponent';
 import { Button } from '@/components/ui/button';
+import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 
 interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
   role: 'system' | 'user';
@@ -18,6 +19,8 @@ interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
 
 export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
   ({ role, content, isStreaming, isLast }: IChatMessageProps, ref) => {
+    const { invokeController } = useContext(chatRoomMessagesContext);
+
     return (
       <div ref={ref} className={cn('flex flex-col')}>
         <div className={cn('mb-1 flex flex-row items-center gap-2')}>
@@ -57,7 +60,22 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
             {role === 'system' && isLast && (
               <div className='ml-auto mt-2 inline-flex items-center gap-2 py-1'>
                 {isStreaming && (
-                  <Button className='h-min rounded-md bg-transparent p-2 text-red-500 shadow-none hover:bg-destructive hover:text-destructive-foreground'>
+                  <Button
+                    onClick={() => {
+                      if (invokeController && invokeController.current) {
+                        try {
+                          if (!invokeController.current.signal.aborted) {
+                            invokeController.current.abort();
+                          }
+                        } catch (error) {
+                          if ((error as Error).name === 'AbortError') {
+                            return;
+                          }
+                        }
+                      }
+                    }}
+                    className='h-min rounded-md bg-transparent p-2 text-red-500 shadow-none hover:bg-destructive hover:text-destructive-foreground'
+                  >
                     <StopIcon className='hover:fill-current' />
                   </Button>
                 )}
