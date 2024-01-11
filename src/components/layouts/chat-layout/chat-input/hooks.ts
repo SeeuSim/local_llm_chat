@@ -94,6 +94,7 @@ export const useChatInputHooks = () => {
           }
           textAreaRef.current?.focus();
         });
+
       if (searchParams.get('initial')) {
         push(`/chat/${roomId}`);
       }
@@ -214,6 +215,7 @@ export const useChatInputHooks = () => {
           const response = await embedResponse.text();
           throw new Error(response);
         }
+        setFiles([]);
         toast({ title: 'Files uploaded! Submitting to model...' });
       }
 
@@ -261,6 +263,7 @@ export const useChatInputHooks = () => {
       if (roomId) {
         queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
+        queryClient.refetchQueries({ queryKey: ['chat', 'documents', 'get', roomId] });
 
         const truncateIndex =
           roomDetails?.truncateIndexes &&

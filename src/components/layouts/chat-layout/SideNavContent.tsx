@@ -22,7 +22,7 @@ export const SideNavContent = () => {
     isLoading,
     isPending,
   } = useQuery<IAPIChatRoomGetOutput, Error>({
-    queryKey: ['chat', 'rooms', 'get', roomId],
+    queryKey: ['chat', 'rooms', 'get', roomId.length > 0 ? roomId.charAt(0) : ''],
     queryFn: async ({ signal }) => {
       return fetch('/api/chat/room/get', {
         method: 'POST',
