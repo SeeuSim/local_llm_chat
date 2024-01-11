@@ -123,7 +123,10 @@ export const useChatInputHooks = () => {
       ...signal,
       body: JSON.stringify({
         message,
-        history: previousMessages,
+        history: previousMessages.map((message) => ({
+          content: message.content,
+          persona: message.persona,
+        })),
         hasDocuments,
         roomId,
       }),

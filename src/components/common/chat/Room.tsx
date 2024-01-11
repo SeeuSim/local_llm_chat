@@ -47,7 +47,6 @@ const Room = () => {
         message: lastUserMessage.content as string,
         // TODO: Add flag for when user discards history
         previousMessages,
-        //TODO:CHANGETOROOMHOOK
         hasDocuments: documents !== undefined && documents.length > 0,
         systemMessageId,
       });

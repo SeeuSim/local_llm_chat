@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 import { useChatInputHooks } from './chat-input/hooks';
 import { Loader2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 
@@ -52,6 +53,10 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
               </div>
             </div>
           )}
+          <div className='ml-4 flex flex-col items-center justify-items-center gap-2 rounded-md bg-background p-2'>
+            <span className='text-xs font-medium text-foreground'>Enable Chat History</span>
+            <Switch className='border border-border' />
+          </div>
         </div>
         <Textarea
           ref={textAreaRef}
@@ -60,9 +65,11 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
           disabled={isInputsDisabled}
         />
       </div>
-      <Button className='' onClick={onSubmit} disabled={isInputsDisabled}>
-        <span>Send</span>
-      </Button>
+      <div className='flex h-full flex-col gap-2'>
+        <Button className='' onClick={onSubmit} disabled={isInputsDisabled}>
+          <span>Send</span>
+        </Button>
+      </div>
     </div>
   );
 });

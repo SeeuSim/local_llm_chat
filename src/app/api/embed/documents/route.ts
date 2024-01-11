@@ -1,9 +1,6 @@
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
-import {
-  getTextChunks,
-  processPDFFiles,
-} from '@/lib/models/embeddings/utils';
+import { getTextChunks, processPDFFiles } from '@/lib/models/embeddings/utils';
 import VectorStoreSingleton from '@/lib/models/vectorStore';
 
 const PATH = 'api/embed/documents';
