@@ -1,6 +1,7 @@
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
 import { IAPIChatRoomGetOutput } from './types';
+import { desc } from 'drizzle-orm';
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +12,8 @@ export async function POST(req: Request) {
         summary: RoomTable.summary,
         modifiedTime: RoomTable.modifiedTime,
       })
-      .from(RoomTable);
+      .from(RoomTable)
+      .orderBy(desc(RoomTable.modifiedTime));
     if (!rooms || !Array.isArray(rooms)) {
       return new Response(
         JSON.stringify({

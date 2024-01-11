@@ -10,18 +10,27 @@ import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
 
 import { useToast } from '@/components/ui/use-toast';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 import { ChatMessage } from './ChatMessage';
+import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Room = () => {
-  const { roomId } = useContext(roomIDContext);
-  const { documents, setDocuments, messages, setMessages, streamed, setInvokeParams } =
-    useContext(chatRoomMessagesContext);
+  const searchParams = useSearchParams();
+  const { roomId } = useContext(searchParamsRoomIdContext);
+  const ref = useRef<HTMLDivElement>(null);
+  const {
+    documents,
+    setDocuments,
+    messages,
+    setMessages,
+    streamed,
+    setInvokeParams,
+    details: roomDetails,
+  } = useContext(chatRoomContext);
   const { toast } = useToast();
-
-  const streamedRef = useRef<HTMLDivElement>(null);
 
   const handleReInvoke = (systemMessageId: string) => {
     if (!messages || messages.length === 0) {
@@ -39,13 +48,18 @@ const Room = () => {
     }
 
     const lastUserMessage = messages[index];
-    const previousMessages = index > 0 ? messages.slice(0, index) : [];
+    const truncatedIndex =
+      roomDetails?.truncateIndexes &&
+      Array.isArray(roomDetails.truncateIndexes) &&
+      roomDetails.truncateIndexes.length > 0
+        ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
+        : 0;
+
+    const previousMessages = index > 0 ? messages.slice(truncatedIndex, index) : [];
     if (setInvokeParams) {
       setInvokeParams({
         message: lastUserMessage.content as string,
-        // TODO: Add flag for when user discards history
         previousMessages,
-        //TODO:CHANGETOROOMHOOK
         hasDocuments: documents !== undefined && documents.length > 0,
         systemMessageId,
       });
@@ -53,11 +67,12 @@ const Room = () => {
   };
 
   const {
-    data: initialMessages,
+    data: messagePayload,
     isFetching,
+    isPending,
     error,
   } = useQuery<IAPIChatMessagesGetOutput, Error>({
-    queryKey: ['chat', 'messages', 'get', roomId],
+    queryKey: ['chat', 'messages', 'get', roomId, searchParams.get('initial')],
     queryFn: async ({ signal }) => {
       const payload: IAPIChatMessagesGetParams = {
         roomId,
@@ -72,6 +87,16 @@ const Room = () => {
       }).then((res) => res.json());
     },
     enabled: roomId !== undefined && roomId.length > 0,
+    refetchInterval: (_query) => {
+      if (
+        searchParams.get('initial') &&
+        messages &&
+        Array.isArray(messages) &&
+        messages.length < 2
+      ) {
+        return 1000;
+      }
+    },
   });
 
   const { data: roomDocuments } = useQuery<IAPIDocumentsGetResults>({
@@ -96,10 +121,10 @@ const Room = () => {
   }, [setDocuments, roomDocuments]);
 
   useEffect(() => {
-    if (setMessages !== undefined && initialMessages && initialMessages.messages !== undefined) {
-      setMessages([...initialMessages.messages]);
+    if (setMessages !== undefined && messagePayload && messagePayload.messages !== undefined) {
+      setMessages([...messagePayload.messages]);
     }
-  }, [setMessages, initialMessages]);
+  }, [setMessages, messagePayload]);
 
   useEffect(() => {
     if (error !== null) {
@@ -115,10 +140,8 @@ const Room = () => {
   }, [error]);
 
   useEffect(() => {
-    if (streamed && streamedRef.current) {
-      streamedRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [streamed, streamedRef]);
+    ref.current?.scrollIntoView();
+  }, [messages, streamed]);
 
   return messages !== undefined && messages.length > 0 ? (
     <>
@@ -127,27 +150,30 @@ const Room = () => {
           key={message.id}
           role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
           content={message.content ?? 'EMPTY'}
-          isLast={index === messages.length - 1}
+          isLast={streamed.length === 0 && index === messages.length - 1}
           isAborted={message.isAborted ?? false}
           reInvoke={() => handleReInvoke(message.id as string)}
+          index={index}
+          isTruncated={roomDetails?.truncateIndexes?.includes(index + 1)}
         />
       ))}
       {streamed.length > 0 && (
-        <>
-          <ChatMessage role='system' content={streamed} isStreaming isLast />
-          <div className='h-0 w-0' messageId='chat-scroll-ref' ref={streamedRef} />
-        </>
+        <ChatMessage role='system' content={streamed} isStreaming isLast index={-1} />
       )}
+      <div className='h-0 w-full' ref={ref} />
     </>
-  ) : messages !== undefined && messages.length === 0 ? (
-    <>
-      <span>No messages here. Send some!</span>
-    </>
+  ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
+    // Empty Room
+    // TODO: Add hero
+    <span>No messages here. Send some!</span>
   ) : (
-    messages === undefined &&
-    isFetching && (
+    !messages?.length &&
+    (isFetching || isPending) && (
       <>
-        <span>Loading...</span>
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
       </>
     )
   );

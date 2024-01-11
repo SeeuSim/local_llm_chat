@@ -11,12 +11,17 @@ import { RoomLink } from '@/components/common/room/RoomLink';
 import { buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const SideNavContent = () => {
-  const { roomId } = useContext(roomIDContext);
-  const { data: roomData } = useQuery<IAPIChatRoomGetOutput, Error>({
+  const { roomId } = useContext(searchParamsRoomIdContext);
+  const {
+    data: roomData,
+    isLoading,
+    isPending,
+  } = useQuery<IAPIChatRoomGetOutput, Error>({
     queryKey: ['chat', 'rooms', 'get', roomId],
     queryFn: async ({ signal }) => {
       return fetch('/api/chat/room/get', {
@@ -42,11 +47,17 @@ export const SideNavContent = () => {
       </Link>
       <ScrollArea className='flex h-[calc(100vh-160px)] w-full border-y border-border/40'>
         <div className='mt-2 flex flex-col gap-2'>
-          {roomData &&
-            roomData.rooms &&
-            roomData.rooms.map((room, index) => (
-              <RoomLink key={index} id={room.id as string} summary={room.summary ?? ''} />
-            ))}
+          {roomData && roomData.rooms
+            ? roomData.rooms.map((room, index) => (
+                <RoomLink key={index} id={room.id as string} summary={room.summary ?? ''} />
+              ))
+            : (isLoading || isPending) && (
+                <div className='mx-auto flex flex-col gap-2'>
+                  <Skeleton className='h-8 w-40' />
+                  <Skeleton className='h-8 w-40' />
+                  <Skeleton className='h-8 w-40' />
+                </div>
+              )}
         </div>
       </ScrollArea>
     </div>

@@ -1,6 +1,7 @@
 import PgInstance from '@/lib/db/dbInstance';
 import { IAPIChatMessagesCreateParams } from './types';
-import { MessagesTable } from '@/lib/db/schema';
+import { MessagesTable, RoomTable } from '@/lib/db/schema';
+import { eq, sql } from 'drizzle-orm';
 
 export async function POST(req: Request) {
   const params: IAPIChatMessagesCreateParams = await req.json();
@@ -13,13 +14,23 @@ export async function POST(req: Request) {
     );
   }
 
+  const ids = Array.from(new Set(params.messages.map((message) => message.roomId as string)));
+
   try {
     const db = await PgInstance.getInstance();
-    const messages = await db.insert(MessagesTable).values(params.messages).returning();
-    return new Response(
-      JSON.stringify({ message: 'Insert successful', ids: messages.map((message) => message.id) }),
-      { status: 200 }
-    );
+    await db.transaction(async (tx) => {
+      await Promise.all([
+        tx.insert(MessagesTable).values(params.messages).returning(),
+        // Update the room for each unique room
+        ...ids.map((id) =>
+          tx
+            .update(RoomTable)
+            .set({ modifiedTime: new Date() })
+            .where(eq(RoomTable.id, sql`${id}::uuid`))
+        ),
+      ]);
+    });
+    return new Response('Inserts successful', { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error }), { status: 500 });
   }

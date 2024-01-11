@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { asc, eq, sql } from 'drizzle-orm';
 
 import PgInstance from '@/lib/db/dbInstance';
 import { MessagesTable } from '@/lib/db/schema';
@@ -26,7 +26,8 @@ export async function POST(req: Request) {
     const messages = await db
       .select()
       .from(MessagesTable)
-      .where(eq(MessagesTable.roomId, sql`${params.roomId}::uuid`));
+      .where(eq(MessagesTable.roomId, sql`${params.roomId}::uuid`))
+      .orderBy(asc(MessagesTable.timeStamp));
     if (!messages || !Array.isArray(messages)) {
       logger.error({ req, params }, formatLoggerMessage(PATH, 'Malformed response', 'postQuery'));
       return new Response(

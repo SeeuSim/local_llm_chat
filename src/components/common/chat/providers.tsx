@@ -1,9 +1,6 @@
 'use client';
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import {
-  type IChatRoomMessagesContext,
-  chatRoomMessagesContext,
-} from '@/lib/contexts/chatRoomMessagesContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { type IChatRoomContext, chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 export const RoomIDProvider = ({
   roomId,
@@ -12,12 +9,16 @@ export const RoomIDProvider = ({
   roomId: string;
   children?: React.ReactNode;
 }) => {
-  return <roomIDContext.Provider value={{ roomId }}>{children}</roomIDContext.Provider>;
+  return (
+    <searchParamsRoomIdContext.Provider value={{ roomId }}>
+      {children}
+    </searchParamsRoomIdContext.Provider>
+  );
 };
 
 export const ChatRoomMessagesProvider = ({
   children,
   ...props
-}: { children?: React.ReactNode } & IChatRoomMessagesContext) => (
-  <chatRoomMessagesContext.Provider value={props}>{children}</chatRoomMessagesContext.Provider>
+}: { children?: React.ReactNode } & IChatRoomContext) => (
+  <chatRoomContext.Provider value={props}>{children}</chatRoomContext.Provider>
 );

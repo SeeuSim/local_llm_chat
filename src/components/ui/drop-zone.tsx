@@ -75,7 +75,7 @@ export function Dropzone({
         )}
       >
         <CardContent
-          className='flex flex-col items-center justify-center gap-2 p-3 text-xs'
+          className='mx-auto flex flex-col items-center justify-center gap-2 pb-0 pt-3 text-xs'
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >

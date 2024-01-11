@@ -2,6 +2,7 @@ import { customVector } from '@useverk/drizzle-pgvector';
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgTable,
   primaryKey,
@@ -16,13 +17,14 @@ export const RoomTable = pgTable(
   'room',
   {
     id: uuid('id').unique().primaryKey().defaultRandom(),
-    createdTime: timestamp('createdTime').defaultNow(),
+    createdTime: timestamp('created_time').defaultNow(),
     // Will have to manually update
-    modifiedTime: timestamp('modifiedTime').defaultNow(),
+    modifiedTime: timestamp('modified_time').defaultNow(),
     summary: text('summary'),
+    truncateIndexes: integer('truncate_indexes').array().default([0]),
   },
   (table) => ({
-    modifiedIndex: index('modifiedIndex').on(table.modifiedTime).desc(),
+    modifiedIndex: index('modified_time_index').on(table.modifiedTime).desc(),
   })
 );
 
@@ -43,7 +45,7 @@ export const MessagesTable = pgTable(
   (table) => {
     return {
       pk: primaryKey({ columns: [table.roomId, table.id] }),
-      timeIndex: index('time_index').on(table.timeStamp).asc(),
+      timeIndex: index('time_stamp_index').on(table.timeStamp).asc(),
     };
   }
 );
@@ -62,7 +64,7 @@ export const EmbeddingsTableConf = {
 
 export const EmbeddingsTable = pgTable(EmbeddingsTableConf.name, {
   id: uuid(EmbeddingsTableConf.columns.id.name).unique().primaryKey().defaultRandom(),
-  createdTime: timestamp('createdTime').defaultNow(),
+  createdTime: timestamp('created_time').defaultNow(),
   content: text(EmbeddingsTableConf.columns.content.name),
   metadata: jsonb(EmbeddingsTableConf.columns.metadata.name).$type<TChunkMetadata>(),
   embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),

@@ -10,30 +10,32 @@ import type { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/creat
 import { IAPIChatMessagesUpdateParams } from '@/app/api/chat/messages/update/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 export const useChatInputHooks = () => {
   const { push } = useRouter();
   const searchParams = useSearchParams();
 
   const queryClient = useQueryClient();
-  const { roomId } = useContext(roomIDContext);
+  const { roomId } = useContext(searchParamsRoomIdContext);
   const {
     invokeController,
+    details: roomDetails,
     documents,
     messages,
     streamed,
     setStreamed,
     invokeParams,
     setInvokeParams,
-  } = useContext(chatRoomMessagesContext);
+  } = useContext(chatRoomContext);
 
   const { toast } = useToast();
 
   const controller = new AbortController();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [files, setFiles] = useState<Array<File>>([]);
+  const [loadingStage, setLoadingStage] = useState('');
 
   const setStreaming = (val: string, options?: { append: boolean }) => {
     if (!setStreamed) {
@@ -87,12 +89,10 @@ export const useChatInputHooks = () => {
         .refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] })
         .then((_res) => setStreaming(RESET_STREAM))
         .then((_res) => {
-          if (textAreaRef.current) {
-            textAreaRef.current.focus();
-          }
           if (invokeController) {
             invokeController.current = new AbortController();
           }
+          textAreaRef.current?.focus();
         });
       if (searchParams.get('initial')) {
         push(`/chat/${roomId}`);
@@ -124,7 +124,10 @@ export const useChatInputHooks = () => {
       ...signal,
       body: JSON.stringify({
         message,
-        history: previousMessages,
+        history: previousMessages.map((message) => ({
+          content: message.content,
+          persona: message.persona,
+        })),
         hasDocuments,
         roomId,
       }),
@@ -196,7 +199,7 @@ export const useChatInputHooks = () => {
       files?: File[];
     }) => {
       if (files.length) {
-        toast({ title: 'Uploading files...' });
+        setLoadingStage('Uploading files...');
         const body = new FormData();
         body.append('roomId', payloadRoomId);
         files.forEach((file) => body.append('files', file));
@@ -206,6 +209,7 @@ export const useChatInputHooks = () => {
           signal: controller.signal,
           body,
         });
+        setLoadingStage('Files Uploaded.');
         if (!embedResponse.ok) {
           const response = await embedResponse.text();
           throw new Error(response);
@@ -230,6 +234,7 @@ export const useChatInputHooks = () => {
           },
         ],
       };
+      setLoadingStage('Sending message...');
       const messageResponse = await fetch('/api/chat/messages/create', {
         method: 'POST',
         headers: {
@@ -237,6 +242,7 @@ export const useChatInputHooks = () => {
         },
         body: JSON.stringify(payload),
       });
+      setLoadingStage('');
 
       if (!messageResponse.ok) {
         const response = await messageResponse.text();
@@ -255,11 +261,18 @@ export const useChatInputHooks = () => {
       if (roomId) {
         queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        // To change messages for when user discards history
+
+        const truncateIndex =
+          roomDetails?.truncateIndexes &&
+          Array.isArray(roomDetails.truncateIndexes) &&
+          roomDetails.truncateIndexes.length > 0
+            ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
+            : 0;
+
         invoke(
           textAreaRef.current?.value as string,
           documents !== undefined && documents.length > 0,
-          messages ?? []
+          messages?.slice(truncateIndex) ?? []
         );
       }
     },
@@ -305,7 +318,7 @@ export const useChatInputHooks = () => {
 
   // For handling the textarea submit
   const onSubmit = () => {
-    if (!textAreaRef.current) {
+    if (!textAreaRef.current || textAreaRef.current.value.length === 0) {
       return;
     }
     if (roomId === '') {
@@ -345,6 +358,7 @@ export const useChatInputHooks = () => {
 
   return {
     isInputsDisabled,
+    loadingStage,
     files,
     setFiles,
     textAreaRef,
