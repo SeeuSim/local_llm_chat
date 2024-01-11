@@ -1,35 +1,62 @@
 'use client';
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { useContext, useRef, useState } from 'react';
 
-import { useRef, useState } from 'react';
-
+import type {
+  IAPIChatRoomGetDetailsParams,
+  TAPIChatRoomGetDetailsResult,
+} from '@/app/api/chat/room/get/details/types';
 import { ChatRoomMessagesProvider } from '@/components/common/chat/providers';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
 import {
   type TChatInvokeParams,
   type TDocument,
   type TMessage,
 } from '@/lib/contexts/chatRoomMessagesContext';
+import { cn } from '@/lib/utils';
 
 import { ChatInput } from './ChatInput';
 import { NavBar } from './NavBar';
 import { SideNav } from './SideNav';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
+  const { roomId } = useContext(roomIDContext);
   const invokeController = useRef(new AbortController());
   const [documents, setDocuments] = useState<Array<TDocument>>([]);
   const [messages, setMessages] = useState<Array<TMessage>>([]);
   const [streamed, setStreamed] = useState('');
   const [invokeParams, setInvokeParams] = useState<TChatInvokeParams | undefined>(undefined);
 
+  const { data: roomDetails } = useQuery<TAPIChatRoomGetDetailsResult>({
+    queryKey: ['chat', 'room', 'get', 'details', roomId],
+    queryFn: async ({ signal }) => {
+      const payload: IAPIChatRoomGetDetailsParams = {
+        roomId,
+      };
+      return await fetch('/api/chat/room/get/details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+        body: JSON.stringify(payload),
+      }).then((res) => res.json());
+    },
+    enabled: roomId.length > 0,
+  });
+
   return (
     <ChatRoomMessagesProvider
       {...{
+        // Room Meta
         documents,
         setDocuments,
         messages,
         setMessages,
+        details: roomDetails,
+        // Streaming
         streamed,
         setStreamed,
         invokeController,

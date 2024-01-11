@@ -2,6 +2,7 @@ import { InferSelectModel } from 'drizzle-orm';
 import React, { MutableRefObject } from 'react';
 
 import type { TChatMessage } from '@/app/api/chat/invoke/types';
+import type { TAPIChatRoomGetDetailsResult } from '@/app/api/chat/room/get/details/types';
 import { MessagesTable } from '@/lib/db/schema';
 
 export type TDocument = string;
@@ -20,6 +21,7 @@ export type TChatInvokeParams = {
 
 export interface IChatRoomMessagesContext {
   // Room State
+  details?: TAPIChatRoomGetDetailsResult;
   documents?: TDocument[];
   setDocuments?: React.Dispatch<React.SetStateAction<TDocument[]>>;
   messages?: TMessage[];
