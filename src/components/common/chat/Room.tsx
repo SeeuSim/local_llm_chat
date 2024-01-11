@@ -1,5 +1,6 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useRef } from 'react';
 
 import type {
@@ -8,19 +9,19 @@ import type {
 } from '@/app/api/chat/messages/get/types';
 import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 
-import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 
 import { ChatMessage } from './ChatMessage';
-import { useSearchParams } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const Room = () => {
   const searchParams = useSearchParams();
   const { roomId } = useContext(searchParamsRoomIdContext);
   const streamedRef = useRef<HTMLDivElement>(null);
+  const lastRef = useRef<HTMLDivElement>(null);
   const {
     documents,
     setDocuments,
@@ -142,10 +143,12 @@ const Room = () => {
   }, [error]);
 
   useEffect(() => {
-    if (streamed.length) {
-      streamedRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [streamed]);
+    streamedRef?.current?.scrollIntoView();
+  }, [streamedRef, streamed]);
+
+  useEffect(() => {
+    lastRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [lastRef, messages]);
 
   return messages !== undefined && messages.length > 0 ? (
     <>
@@ -176,11 +179,22 @@ const Room = () => {
             isStreaming
             isLast
             index={-1}
-            ref={invokeParams?.systemMessageIndex === messages.length - 1 ? null : streamedRef}
+            ref={
+              invokeParams &&
+              invokeParams.systemMessageIndex &&
+              invokeParams?.systemMessageIndex !== messages.length - 1
+                ? streamedRef
+                : null
+            }
           />
-          {invokeParams?.systemMessageIndex === messages.length - 1 && (
-            <div className='h-0 w-full' ref={streamedRef} />
-          )}
+          <div
+            className='h-0 w-full'
+            ref={
+              invokeParams?.systemMessageIndex === messages.length - 1 || !invokeParams
+                ? streamedRef
+                : null
+            }
+          />
         </>
       )}
       {streamed.length > 0 &&
@@ -200,6 +214,7 @@ const Room = () => {
             />
           );
         })}
+      <div className='h-0 w-0' ref={lastRef} />
     </>
   ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
     // Empty Room
@@ -209,7 +224,6 @@ const Room = () => {
     !messages?.length &&
     (isFetching || isPending) && (
       <>
-        <Skeleton className='h-20 w-full' />
         <Skeleton className='h-20 w-full' />
         <Skeleton className='h-20 w-full' />
         <Skeleton className='h-20 w-full' />

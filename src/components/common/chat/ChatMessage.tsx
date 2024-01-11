@@ -27,16 +27,7 @@ interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
 
 export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
   (
-    {
-      role,
-      content,
-      isStreaming,
-      isLast,
-      isAborted,
-      index,
-      isTruncated: propsIsTruncated,
-      reInvoke,
-    },
+    { role, content, isStreaming, isAborted, index, isTruncated: propsIsTruncated, reInvoke },
     ref
   ) => {
     const { roomId } = useContext(searchParamsRoomIdContext);
