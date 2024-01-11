@@ -10,24 +10,25 @@ import type { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/creat
 import { IAPIChatMessagesUpdateParams } from '@/app/api/chat/messages/update/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 export const useChatInputHooks = () => {
   const { push } = useRouter();
   const searchParams = useSearchParams();
 
   const queryClient = useQueryClient();
-  const { roomId } = useContext(roomIDContext);
+  const { roomId } = useContext(searchParamsRoomIdContext);
   const {
     invokeController,
+    details: roomDetails,
     documents,
     messages,
     streamed,
     setStreamed,
     invokeParams,
     setInvokeParams,
-  } = useContext(chatRoomMessagesContext);
+  } = useContext(chatRoomContext);
 
   const { toast } = useToast();
 
@@ -260,11 +261,18 @@ export const useChatInputHooks = () => {
       if (roomId) {
         queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        // To change messages for when user discards history
+
+        const truncateIndex =
+          roomDetails?.truncateIndexes &&
+          Array.isArray(roomDetails.truncateIndexes) &&
+          roomDetails.truncateIndexes.length > 0
+            ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
+            : 0;
+
         invoke(
           textAreaRef.current?.value as string,
           documents !== undefined && documents.length > 0,
-          messages ?? []
+          messages?.slice(truncateIndex) ?? []
         );
       }
     },

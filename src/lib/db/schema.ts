@@ -21,7 +21,7 @@ export const RoomTable = pgTable(
     // Will have to manually update
     modifiedTime: timestamp('modified_time').defaultNow(),
     summary: text('summary'),
-    truncateIndex: integer('truncate_index').default(0),
+    truncateIndexes: integer('truncate_indexes').array().default([0]),
   },
   (table) => ({
     modifiedIndex: index('modified_time_index').on(table.modifiedTime).desc(),

@@ -9,12 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { useSearchParams } from 'next/navigation';
+import { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
 
 interface IRoomLinkProps {
   id: string;
@@ -25,8 +26,8 @@ interface IRoomLinkProps {
 
 export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
   const searchParams = useSearchParams();
-  const { roomId } = useContext(roomIDContext);
-  const { messages } = useContext(chatRoomMessagesContext);
+  const { roomId } = useContext(searchParamsRoomIdContext);
+  const { messages } = useContext(chatRoomContext);
 
   const [streamedSummary, setStreamedSummary] = useState(summary);
 
@@ -63,12 +64,17 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
         setStreamedSummary((prev) => prev + val);
       } while (!isStreamFinished);
 
+      const params: TAPIChatRoomUpdateParams = {
+        id: roomId,
+        summary: acc,
+      };
+
       const updateSummary = await fetch('/api/chat/room/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ roomId, summary: acc }),
+        body: JSON.stringify(params),
       });
       if (!updateSummary.ok) {
         // TODO: Handle

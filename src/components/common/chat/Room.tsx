@@ -10,8 +10,8 @@ import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
 
 import { useToast } from '@/components/ui/use-toast';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 import { ChatMessage } from './ChatMessage';
 import { useSearchParams } from 'next/navigation';
@@ -19,10 +19,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const Room = () => {
   const searchParams = useSearchParams();
-  const { roomId } = useContext(roomIDContext);
+  const { roomId } = useContext(searchParamsRoomIdContext);
   const ref = useRef<HTMLDivElement>(null);
-  const { documents, setDocuments, messages, setMessages, streamed, setInvokeParams } =
-    useContext(chatRoomMessagesContext);
+  const {
+    documents,
+    setDocuments,
+    messages,
+    setMessages,
+    streamed,
+    setInvokeParams,
+    details: roomDetails,
+  } = useContext(chatRoomContext);
   const { toast } = useToast();
 
   const handleReInvoke = (systemMessageId: string) => {
@@ -41,11 +48,17 @@ const Room = () => {
     }
 
     const lastUserMessage = messages[index];
-    const previousMessages = index > 0 ? messages.slice(0, index) : [];
+    const truncatedIndex =
+      roomDetails?.truncateIndexes &&
+      Array.isArray(roomDetails.truncateIndexes) &&
+      roomDetails.truncateIndexes.length > 0
+        ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
+        : 0;
+
+    const previousMessages = index > 0 ? messages.slice(truncatedIndex, index) : [];
     if (setInvokeParams) {
       setInvokeParams({
         message: lastUserMessage.content as string,
-        // TODO: Add flag for when user discards history
         previousMessages,
         hasDocuments: documents !== undefined && documents.length > 0,
         systemMessageId,
@@ -140,9 +153,12 @@ const Room = () => {
           isLast={streamed.length === 0 && index === messages.length - 1}
           isAborted={message.isAborted ?? false}
           reInvoke={() => handleReInvoke(message.id as string)}
+          index={index}
         />
       ))}
-      {streamed.length > 0 && <ChatMessage role='system' content={streamed} isStreaming isLast />}
+      {streamed.length > 0 && (
+        <ChatMessage role='system' content={streamed} isStreaming isLast index={-1} />
+      )}
       <div className='h-0 w-full' ref={ref} />
     </>
   ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (

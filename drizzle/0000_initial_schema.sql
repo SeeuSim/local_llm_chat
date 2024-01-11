@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "room" (
 	"created_time" timestamp DEFAULT now(),
 	"modified_time" timestamp DEFAULT now(),
 	"summary" text,
-	"truncate_index" integer DEFAULT 0,
+	"truncate_indexes" integer[] DEFAULT ARRAY[0],
 	CONSTRAINT "room_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint

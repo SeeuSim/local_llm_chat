@@ -1,5 +1,5 @@
 {
-  "id": "9ef7725b-f06c-4ce7-86a1-961e63d30ee0",
+  "id": "db2bd5b6-4141-477d-ad60-01e4d14d8fc7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -172,12 +172,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "truncate_index": {
-          "name": "truncate_index",
-          "type": "integer",
+        "truncate_indexes": {
+          "name": "truncate_indexes",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": false,
-          "default": 0
+          "default": [
+            0
+          ]
         }
       },
       "indexes": {

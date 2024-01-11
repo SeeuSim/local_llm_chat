@@ -11,12 +11,12 @@ import { RoomLink } from '@/components/common/room/RoomLink';
 import { buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const SideNavContent = () => {
-  const { roomId } = useContext(roomIDContext);
+  const { roomId } = useContext(searchParamsRoomIdContext);
   const {
     data: roomData,
     isLoading,

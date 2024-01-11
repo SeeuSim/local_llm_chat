@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useContext, useRef, useState } from 'react';
 
 import type {
@@ -9,20 +9,22 @@ import type {
 } from '@/app/api/chat/room/get/details/types';
 import { ChatRoomMessagesProvider } from '@/components/common/chat/providers';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { roomIDContext } from '@/lib/contexts/chatRoomIdContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import {
   type TChatInvokeParams,
   type TDocument,
   type TMessage,
-} from '@/lib/contexts/chatRoomMessagesContext';
+} from '@/lib/contexts/chatRoomContext';
 import { cn } from '@/lib/utils';
 
 import { ChatInput } from './ChatInput';
 import { NavBar } from './NavBar';
 import { SideNav } from './SideNav';
+import { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
-  const { roomId } = useContext(roomIDContext);
+  const queryClient = useQueryClient();
+  const { roomId } = useContext(searchParamsRoomIdContext);
   const invokeController = useRef(new AbortController());
   const [documents, setDocuments] = useState<Array<TDocument>>([]);
   const [messages, setMessages] = useState<Array<TMessage>>([]);
@@ -47,6 +49,22 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
     enabled: roomId.length > 0,
   });
 
+  const { mutate: updateRoom } = useMutation<void, Error, TAPIChatRoomUpdateParams>({
+    mutationKey: ['room', 'update', 'details', roomId],
+    mutationFn: async (params: TAPIChatRoomUpdateParams) => {
+      return await fetch('/api/chat/room/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      }).then((res) => res.json());
+    },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['chat', 'room', 'get', 'details', roomId] });
+    },
+  });
+
   return (
     <ChatRoomMessagesProvider
       {...{
@@ -56,6 +74,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
         messages,
         setMessages,
         details: roomDetails,
+        updateRoom,
         // Streaming
         streamed,
         setStreamed,

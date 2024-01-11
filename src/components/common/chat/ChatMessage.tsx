@@ -7,24 +7,45 @@ import { MarkdownComponent } from '@/components/common/markdown/MarkdownComponen
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-
-import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
-import { cn } from '@/lib/utils';
 import { STREAM_LOADING_FLAG } from '@/components/layouts/chat-layout/constants';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { cn } from '@/lib/utils';
 
 interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
   role: 'system' | 'user';
   content: string;
+  index: number;
   isStreaming?: boolean;
   isLast?: boolean;
   isAborted?: boolean;
   reInvoke?: () => void;
+  isTruncated?: boolean;
 }
 
 export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
-  ({ role, content, isStreaming, isLast, isAborted, reInvoke }: IChatMessageProps, ref) => {
-    const { invokeController, streamed } = useContext(chatRoomMessagesContext);
+  (
+    {
+      role,
+      content,
+      isStreaming,
+      isLast,
+      isAborted,
+      index,
+      isTruncated,
+      reInvoke,
+    }: IChatMessageProps,
+    ref
+  ) => {
+    const { roomId } = useContext(searchParamsRoomIdContext);
+    const {
+      invokeController,
+      streamed,
+      details: roomDetails,
+      updateRoom,
+    } = useContext(chatRoomContext);
     const [onReinvokeHide, setOnReinvokeHide] = useState(false);
 
     return (
@@ -115,6 +136,19 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                       <TooltipTrigger asChild>
                         <Button
                           variant='ghost'
+                          onClick={() => {
+                            if (updateRoom) {
+                              const updatedIndexes = new Set(roomDetails?.truncateIndexes ?? []);
+                              if (!isTruncated) {
+                                updatedIndexes.add(index);
+                              } else if (isTruncated && index > 0) {
+                                updatedIndexes.delete(index);
+                              }
+                              updateRoom({
+                                truncateIndexes: Array.from(updatedIndexes).sort(),
+                              });
+                            }
+                          }}
                           className='h-8 py-1 text-muted-foreground/40 dark:text-secondary dark:hover:text-secondary-foreground'
                         >
                           <span className='text-sm font-medium'>Add Breakpoint</span>
@@ -126,7 +160,12 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <hr className='w-full border border-muted-foreground/10 group-hover:border-red-500 dark:border-secondary/40' />
+                <hr
+                  className={cn(
+                    'w-full border border-muted-foreground/10 group-hover:border-red-500 dark:border-secondary/40',
+                    isTruncated && 'border-red-500'
+                  )}
+                />
               </div>
             )}
           </>

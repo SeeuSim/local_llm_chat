@@ -1,4 +1,4 @@
-export interface IAPIChatRoomUpdateParams {
-  roomId: string;
-  summary: string;
-}
+import { RoomTable } from '@/lib/db/schema';
+import type { InferInsertModel } from 'drizzle-orm';
+
+export type TAPIChatRoomUpdateParams = InferInsertModel<typeof RoomTable>;
