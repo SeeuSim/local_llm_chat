@@ -49,7 +49,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
     enabled: roomId.length > 0,
   });
 
-  const { mutate: updateRoom } = useMutation<void, Error, TAPIChatRoomUpdateParams>({
+  const { mutate: updateRoom } = useMutation<Response, Error, TAPIChatRoomUpdateParams>({
     mutationKey: ['room', 'update', 'details', roomId],
     mutationFn: async (params: TAPIChatRoomUpdateParams) => {
       return await fetch('/api/chat/room/update', {
@@ -58,7 +58,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
-      }).then((res) => res.json());
+      });
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['chat', 'room', 'get', 'details', roomId] });

@@ -12,10 +12,11 @@ export async function POST(req: Request) {
   const params: Partial<TAPIChatRoomUpdateParams> = await req.json();
 
   if (
-    (!params.id && !params.summary) ||
-    params.truncateIndexes === undefined ||
-    params.truncateIndexes === null ||
-    !Array.isArray(params.truncateIndexes)
+    (params.truncateIndexes === undefined ||
+      params.truncateIndexes === null ||
+      !Array.isArray(params.truncateIndexes)) &&
+    !params.id &&
+    !params.summary
   ) {
     const errorMessage = 'Invalid Parameters';
     const errorCode = 400;
@@ -43,11 +44,13 @@ export async function POST(req: Request) {
         ...(params.id && params.summary
           ? { id: params.id, summary: params.summary }
           : { truncateIndexes: params.truncateIndexes }),
+        modifiedTime: new Date(),
       })
       .where(eq(RoomTable.id, sql`${params.id}::uuid`))
       .returning();
 
-    if (result.length > 0 && result[0].summary) {
+    if (result.length > 0) {
+      logger.info({ req, params }, formatLoggerMessage(PATH, 'Updated'));
       return new Response('OK', { status: 200 });
     }
     logger.error(

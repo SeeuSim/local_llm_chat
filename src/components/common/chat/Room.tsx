@@ -154,6 +154,7 @@ const Room = () => {
           isAborted={message.isAborted ?? false}
           reInvoke={() => handleReInvoke(message.id as string)}
           index={index}
+          isTruncated={roomDetails?.truncateIndexes?.includes(index + 1)}
         />
       ))}
       {streamed.length > 0 && (

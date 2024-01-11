@@ -24,7 +24,7 @@ export type TChatInvokeParams = {
 export interface IChatRoomContext {
   // Room State
   details?: TAPIChatRoomGetDetailsResult;
-  updateRoom?: UseMutateFunction<void, Error, TAPIChatRoomUpdateParams>;
+  updateRoom?: UseMutateFunction<Response, Error, TAPIChatRoomUpdateParams>;
   documents?: TDocument[];
   setDocuments?: React.Dispatch<React.SetStateAction<TDocument[]>>;
   messages?: TMessage[];
