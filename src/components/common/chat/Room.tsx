@@ -81,7 +81,7 @@ const Room = () => {
         Array.isArray(messages) &&
         messages.length < 2
       ) {
-        return 500;
+        return 1000;
       }
     },
   });

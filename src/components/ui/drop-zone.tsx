@@ -120,7 +120,9 @@ export function Dropzone({
                   blockInteraction && 'bg-muted text-muted-foreground'
                 )}
               >
-                <span className={cn('flex-1 truncate')}>{file.name}</span>
+                <span className={cn('flex-1 truncate')}>
+                  {file.name} {file.size}
+                </span>
                 <Button
                   disabled={blockInteraction}
                   onClick={() => {
