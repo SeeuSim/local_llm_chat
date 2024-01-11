@@ -1,5 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
 import { getTextChunks, processPDFFiles } from '@/lib/models/embeddings/utils';
@@ -7,7 +5,7 @@ import VectorStoreSingleton from '@/lib/models/vectorStore';
 
 const PATH = 'api/embed/documents';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const logger = getLogger(req);
 
   // 1. Parse payload
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest) {
   const files = payload.getAll('files') as Array<File>;
   if (!roomId || roomId === null || !files || !Array.isArray(files)) {
     // Validate files, roomId
-    return new NextResponse(JSON.stringify({ message: 'Invalid Params' }), { status: 400 });
+    return new Response(JSON.stringify({ message: 'Invalid Params' }), { status: 400 });
   }
   const documents = await processPDFFiles(files, roomId);
   const chunks = await getTextChunks(documents);
@@ -65,7 +63,7 @@ export async function POST(req: NextRequest) {
       },
       formatLoggerMessage(PATH, 'These errors occurred.')
     );
-    return new NextResponse(
+    return new Response(
       JSON.stringify({
         message: 'These insertions and errors occurred',
         errors,
@@ -85,7 +83,7 @@ export async function POST(req: NextRequest) {
     },
     formatLoggerMessage(PATH, 'Documents inserted successfully.')
   );
-  return new NextResponse(
+  return new Response(
     JSON.stringify({
       message: 'Documents inserted successfully',
       successfulInserts,

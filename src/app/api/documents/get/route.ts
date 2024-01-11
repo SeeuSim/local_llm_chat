@@ -1,5 +1,4 @@
 import { sql } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
 
 import PgInstance from '@/lib/db/dbInstance';
 import { EmbeddingsTable } from '@/lib/db/schema';
@@ -9,12 +8,12 @@ import type { IAPIDocumentsGetParams, IAPIDocumentsGetResults } from './types';
 
 const PATH = 'api/documents/get';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const logger = getLogger(req);
   const params: IAPIDocumentsGetParams = await req.json();
 
   if (!params || !params.roomId) {
-    return new NextResponse(JSON.stringify({}), { status: 400 });
+    return new Response(JSON.stringify({}), { status: 400 });
   }
 
   const column = EmbeddingsTable.metadata;
@@ -40,7 +39,7 @@ export async function POST(req: NextRequest) {
         { req, params, result: { documentsResponse } },
         formatLoggerMessage(PATH, 'Malformed response', 'postQuery')
       );
-      return new NextResponse(
+      return new Response(
         JSON.stringify({
           error: {
             message: 'An unexpected error occurred',
@@ -56,8 +55,8 @@ export async function POST(req: NextRequest) {
       .filter((v) => v) as string[];
 
     const output: IAPIDocumentsGetResults = { documents: uniqueTitles };
-    return new NextResponse(JSON.stringify(output), { status: 200 });
+    return new Response(JSON.stringify(output), { status: 200 });
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error }), { status: 500 });
+    return new Response(JSON.stringify({ error }), { status: 500 });
   }
 }

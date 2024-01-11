@@ -1,15 +1,14 @@
 import { eq, sql } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
 
 import PgInstance from '@/lib/db/dbInstance';
 import { MessagesTable, RoomTable } from '@/lib/db/schema';
 
 import { IAPIChatMessagesCreateParams } from './types';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const params: IAPIChatMessagesCreateParams = await req.json();
   if (!params || !params.messages || !Array.isArray(params.messages)) {
-    return new NextResponse(
+    return new Response(
       JSON.stringify({
         message: 'Invalid payload, or missing parameters',
       }),
@@ -33,8 +32,8 @@ export async function POST(req: NextRequest) {
         ),
       ]);
     });
-    return new NextResponse('Inserts successful', { status: 200 });
+    return new Response('Inserts successful', { status: 200 });
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error }), { status: 500 });
+    return new Response(JSON.stringify({ error }), { status: 500 });
   }
 }

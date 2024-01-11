@@ -1,12 +1,11 @@
 import { desc } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
 
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
 
 import { IAPIChatRoomGetOutput } from './types';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const db = await PgInstance.getInstance();
     const rooms = await db
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
       .from(RoomTable)
       .orderBy(desc(RoomTable.modifiedTime));
     if (!rooms || !Array.isArray(rooms)) {
-      return new NextResponse(
+      return new Response(
         JSON.stringify({
           error: {
             message: 'An unexpected error occurred',
@@ -29,9 +28,9 @@ export async function POST(req: NextRequest) {
       );
     }
     const output: IAPIChatRoomGetOutput = { rooms };
-    return new NextResponse(JSON.stringify(output), { status: 200 });
+    return new Response(JSON.stringify(output), { status: 200 });
   } catch (error) {
-    return new NextResponse(
+    return new Response(
       JSON.stringify({
         error,
       }),

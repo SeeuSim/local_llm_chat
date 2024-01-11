@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { eq, sql } from 'drizzle-orm';
 
 import PgInstance from '@/lib/db/dbInstance';
@@ -8,7 +7,7 @@ import type { TAPIChatRoomUpdateParams } from './types';
 
 const PATH = 'api/chat/room/update';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const logger = getLogger(req);
   const params: Partial<TAPIChatRoomUpdateParams> = await req.json();
 
@@ -34,7 +33,7 @@ export async function POST(req: NextRequest) {
       formatLoggerMessage(PATH, 'Invalid parameters', 'validateParams')
     );
 
-    return new NextResponse(errorMessage, { status: errorCode });
+    return new Response(errorMessage, { status: errorCode });
   }
   try {
     const db = await PgInstance.getInstance();
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     if (result.length > 0) {
       logger.info({ req, params }, formatLoggerMessage(PATH, 'Updated'));
-      return new NextResponse('OK', { status: 200 });
+      return new Response('OK', { status: 200 });
     }
     logger.error(
       {
@@ -64,7 +63,7 @@ export async function POST(req: NextRequest) {
       },
       formatLoggerMessage(PATH, 'An error occurred', 'postUpdate')
     );
-    return new NextResponse(JSON.stringify(result), { status: 500 });
+    return new Response(JSON.stringify(result), { status: 500 });
   } catch (error) {
     const errorMessage = (error as Error).message;
     const code = 500;
@@ -72,6 +71,6 @@ export async function POST(req: NextRequest) {
       { req, params, error: { code, message: errorMessage } },
       formatLoggerMessage(PATH, errorMessage, 'tryCatch')
     );
-    return new NextResponse(errorMessage, { status: code });
+    return new Response(errorMessage, { status: code });
   }
 }

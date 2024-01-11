@@ -1,5 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 
 import HuggingFaceEmbeddingSingleton from '@/lib/models/embeddings/huggingfaceEmbeddings';
@@ -7,7 +5,7 @@ import HuggingFaceEmbeddingSingleton from '@/lib/models/embeddings/huggingfaceEm
 
 const PATH = 'api/embed';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const logger = getLogger(req);
   logger.info(
     {
@@ -30,5 +28,5 @@ export async function POST(req: NextRequest) {
     formatLoggerMessage(PATH, 'Embeddings generated successfully')
   );
 
-  return NextResponse.json({ status: 200, message: 'OK' });
+  return Response.json({ status: 200, message: 'OK' });
 }

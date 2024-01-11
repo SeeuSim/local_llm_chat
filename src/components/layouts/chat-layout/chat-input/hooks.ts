@@ -259,7 +259,7 @@ export const useChatInputHooks = () => {
         description: error.message,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_response, vars, _context) => {
       if (roomId) {
         queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
@@ -274,7 +274,8 @@ export const useChatInputHooks = () => {
 
         invoke(
           textAreaRef.current?.value as string,
-          documents !== undefined && documents.length > 0,
+          (documents !== undefined && documents.length > 0) ||
+            (vars.files !== undefined && vars.files?.length !== 0),
           messages?.slice(truncateIndex) ?? []
         );
       }
