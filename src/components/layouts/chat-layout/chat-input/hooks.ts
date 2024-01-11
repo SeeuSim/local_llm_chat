@@ -310,7 +310,7 @@ export const useChatInputHooks = () => {
 
   // For handling the textarea submit
   const onSubmit = () => {
-    if (!textAreaRef.current) {
+    if (!textAreaRef.current || textAreaRef.current.value.length === 0) {
       return;
     }
     if (roomId === '') {

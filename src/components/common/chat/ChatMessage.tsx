@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { chatRoomMessagesContext } from '@/lib/contexts/chatRoomMessagesContext';
 import { cn } from '@/lib/utils';
 import { STREAM_LOADING_FLAG } from '@/components/layouts/chat-layout/constants';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface IChatMessageProps extends HTMLAttributes<HTMLDivElement> {
   role: 'system' | 'user';
@@ -104,6 +105,28 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                     <ReloadIcon />
                   </Button>
                 )}
+              </div>
+            )}
+            {!isStreaming && (
+              <div className='group relative mt-4 hidden w-[calc(100%+32px)] xl:flex'>
+                <div className='absolute right-[calc(-120px-24px)] top-[-16px]'>
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          className='h-8 py-1 text-muted-foreground/40 dark:text-secondary dark:hover:text-secondary-foreground'
+                        >
+                          <span className='text-sm font-medium'>Add Breakpoint</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className='translate-x-[-16px] border border-border bg-background text-foreground'>
+                        Disregard all chat history before this point
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <hr className='w-full border border-muted-foreground/10 group-hover:border-red-500 dark:border-secondary/40' />
               </div>
             )}
           </>

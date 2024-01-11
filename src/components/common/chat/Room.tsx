@@ -137,7 +137,7 @@ const Room = () => {
           key={message.id}
           role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
           content={message.content ?? 'EMPTY'}
-          isLast={index === messages.length - 1}
+          isLast={streamed.length === 0 && index === messages.length - 1}
           isAborted={message.isAborted ?? false}
           reInvoke={() => handleReInvoke(message.id as string)}
         />

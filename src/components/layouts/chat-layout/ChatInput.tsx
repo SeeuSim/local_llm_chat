@@ -7,9 +7,8 @@ import { Dropzone } from '@/components/ui/drop-zone';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
-import { useChatInputHooks } from './chat-input/hooks';
 import { Loader2 } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { useChatInputHooks } from './chat-input/hooks';
 
 type ChatInputProps = HTMLAttributes<HTMLDivElement>;
 
@@ -53,10 +52,6 @@ export const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(({ className
               </div>
             </div>
           )}
-          <div className='ml-4 flex flex-col items-center justify-items-center gap-2 rounded-md bg-background p-2'>
-            <span className='text-xs font-medium text-foreground'>Enable Chat History</span>
-            <Switch className='border border-border' />
-          </div>
         </div>
         <Textarea
           ref={textAreaRef}
