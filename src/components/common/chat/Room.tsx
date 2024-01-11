@@ -20,24 +20,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 const Room = () => {
   const searchParams = useSearchParams();
   const { roomId } = useContext(searchParamsRoomIdContext);
-  const ref = useRef<HTMLDivElement>(null);
+  const streamedRef = useRef<HTMLDivElement>(null);
   const {
     documents,
     setDocuments,
     messages,
     setMessages,
     streamed,
+    invokeParams,
     setInvokeParams,
     details: roomDetails,
   } = useContext(chatRoomContext);
   const { toast } = useToast();
 
-  const handleReInvoke = (systemMessageId: string) => {
+  const handleReInvoke = (messageIndex: number, systemMessageId: string) => {
     if (!messages || messages.length === 0) {
       return;
     }
     let index = -1;
-    for (let i = messages.length - 1; i >= 0; i--) {
+    for (let i = messageIndex - 1; i >= 0; i--) {
       if (messages[i].persona === 'user') {
         index = i;
         break;
@@ -62,6 +63,7 @@ const Room = () => {
         previousMessages,
         hasDocuments: documents !== undefined && documents.length > 0,
         systemMessageId,
+        systemMessageIndex: messageIndex,
       });
     }
   };
@@ -140,27 +142,64 @@ const Room = () => {
   }, [error]);
 
   useEffect(() => {
-    ref.current?.scrollIntoView();
-  }, [messages, streamed]);
+    if (streamed.length) {
+      streamedRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [streamed]);
 
   return messages !== undefined && messages.length > 0 ? (
     <>
-      {messages.map((message, index) => (
-        <ChatMessage
-          key={message.id}
-          role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
-          content={message.content ?? 'EMPTY'}
-          isLast={streamed.length === 0 && index === messages.length - 1}
-          isAborted={message.isAborted ?? false}
-          reInvoke={() => handleReInvoke(message.id as string)}
-          index={index}
-          isTruncated={roomDetails?.truncateIndexes?.includes(index + 1)}
-        />
-      ))}
+      {messages
+        .slice(
+          0,
+          invokeParams?.systemMessageIndex !== undefined
+            ? invokeParams.systemMessageIndex
+            : messages.length
+        )
+        .map((message, index) => (
+          <ChatMessage
+            key={message.id}
+            role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
+            content={message.content ?? 'EMPTY'}
+            isLast={streamed.length === 0 && index === messages.length - 1}
+            isAborted={message.isAborted ?? false}
+            reInvoke={(index: number) => handleReInvoke(index, message.id as string)}
+            index={index}
+            isTruncated={roomDetails?.truncateIndexes?.includes(index + 1)}
+          />
+        ))}
       {streamed.length > 0 && (
-        <ChatMessage role='system' content={streamed} isStreaming isLast index={-1} />
+        <>
+          <ChatMessage
+            role='system'
+            content={streamed}
+            isStreaming
+            isLast
+            index={-1}
+            ref={invokeParams?.systemMessageIndex === messages.length - 1 ? null : streamedRef}
+          />
+          {invokeParams?.systemMessageIndex === messages.length - 1 && (
+            <div className='h-0 w-full' ref={streamedRef} />
+          )}
+        </>
       )}
-      <div className='h-0 w-full' ref={ref} />
+      {streamed.length > 0 &&
+        invokeParams?.systemMessageIndex !== undefined &&
+        messages.slice(invokeParams.systemMessageIndex + 1).map((message, index) => {
+          const actualIndex = index + invokeParams.systemMessageIndex + 1;
+          return (
+            <ChatMessage
+              key={message.id}
+              role={message.persona ? (message.persona as 'system' | 'user') : 'user'}
+              content={message.content ?? 'EMPTY'}
+              isLast={streamed.length === 0 && index === messages.length - 1}
+              isAborted={message.isAborted ?? false}
+              index={actualIndex}
+              reInvoke={(index: number) => handleReInvoke(index, message.id as string)}
+              isTruncated={roomDetails?.truncateIndexes?.includes(actualIndex + 1)}
+            />
+          );
+        })}
     </>
   ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
     // Empty Room

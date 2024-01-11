@@ -19,6 +19,7 @@ export type TChatInvokeParams = {
   hasDocuments: boolean;
   previousMessages: TChatMessage[];
   systemMessageId: string;
+  systemMessageIndex: number;
 };
 
 export interface IChatRoomContext {
