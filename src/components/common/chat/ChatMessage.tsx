@@ -141,9 +141,9 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                 </Button>
               </div>
             )}
-            {!isStreaming && (
+            {!isStreaming && index > 0 && (
               <>
-                <div className='mt-2 inline-flex translate-x-2 items-center justify-between gap-4 xl:hidden'>
+                <div className='group mt-2 inline-flex translate-x-2 items-center justify-between gap-4 xl:hidden'>
                   {isTruncated ? (
                     // Fix aggressive caching issues, else conditional styling
                     <hr className='w-full border border-red-500' />
@@ -155,6 +155,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                       <TooltipTrigger asChild>
                         <Button
                           variant='ghost'
+                          disabled={streamed.length > 0}
                           onClick={updateBreakPoint}
                           className={cn(
                             'group h-8 py-1',
@@ -172,7 +173,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                           )}
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent className='translate-x-[-16px] border border-border bg-background text-foreground'>
+                      <TooltipContent className='border border-border bg-background text-foreground'>
                         Disregard all chat history before this point
                       </TooltipContent>
                     </Tooltip>
@@ -191,6 +192,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                         <TooltipTrigger asChild>
                           <Button
                             variant='ghost'
+                            disabled={streamed.length > 0}
                             onClick={updateBreakPoint}
                             className={cn(
                               'group h-8 py-1',

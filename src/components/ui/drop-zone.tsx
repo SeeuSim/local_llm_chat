@@ -110,7 +110,7 @@ export function Dropzone({
               accept={`.${fileExtension}`}
             />
           </div>
-          <div className='flex max-w-[calc(100vw-320px)] flex-1 flex-row gap-2 overflow-y-auto pb-2 scrollbar-thin scrollbar-track-inherit scrollbar-thumb-muted-foreground md:max-w-[calc(100vw-192px-160px)]'>
+          <div className='flex max-w-[calc(100vw-72px)] flex-1 flex-row gap-2 overflow-y-auto pb-2 scrollbar-thin scrollbar-track-inherit scrollbar-thumb-muted-foreground sm:max-w-[calc(100vw-320px)] md:max-w-[calc(100vw-192px-160px)]'>
             {files.map((file, index) => (
               <div
                 key={file.name}
