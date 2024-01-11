@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS "embeddings" (
 	"created_time" timestamp DEFAULT now(),
 	"content" text,
 	"metadata" jsonb,
-	"embedding" vector(768),
+	-- "embedding" vector(768),
+	"embedding" vector(384),
 	CONSTRAINT "embeddings_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint

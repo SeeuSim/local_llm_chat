@@ -1,6 +1,8 @@
+import { StringOutputParser } from 'langchain/schema/output_parser';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
-import { StringOutputParser } from 'langchain/schema/output_parser';
 import {
   PROMPT_REGEXES,
   PROMPT_SUMMARISATION_TEMPLATES,
@@ -11,7 +13,7 @@ import {
 
 const PATH = 'api/summarise';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const logger = getLogger(req);
   const body = (await req.json()) as Partial<IAPISummariseInput>;
 
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
   }
 
   if (!body.userMessage && !body.systemMessage) {
-    return new Response(JSON.stringify({}), { status: 401 });
+    return new NextResponse(JSON.stringify({}), { status: 401 });
   }
 
   const conversation: Array<string> = [];
@@ -45,5 +47,5 @@ export async function POST(req: Request) {
   };
   const stream = await model.pipe(new StringOutputParser()).stream(SummarisationTemplate);
 
-  return new Response(stream);
+  return new NextResponse(stream);
 }

@@ -1,12 +1,15 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { eq, sql } from 'drizzle-orm';
+
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
 import { formatLoggerMessage, getLogger } from '@/lib/log';
-import { eq, sql } from 'drizzle-orm';
-import { IAPIChatRoomGetDetailsParams, TAPIChatRoomGetDetailsResult } from './types';
+
+import type { IAPIChatRoomGetDetailsParams, TAPIChatRoomGetDetailsResult } from './types';
 
 const PATH = 'api/chat/room/get/details';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const logger = getLogger(req);
   const params: IAPIChatRoomGetDetailsParams = await req.json();
   if (!params || !params.roomId) {
@@ -24,7 +27,7 @@ export async function POST(req: Request) {
       formatLoggerMessage(PATH, errorMessage, 'validateParams')
     );
 
-    return new Response(errorMessage, { status: errorCode });
+    return new NextResponse(errorMessage, { status: errorCode });
   }
   try {
     const db = await PgInstance.getInstance();
@@ -50,10 +53,10 @@ export async function POST(req: Request) {
         formatLoggerMessage(PATH, errorMessage, 'postResult')
       );
 
-      return new Response(errorMessage, { status: errorCode });
+      return new NextResponse(errorMessage, { status: errorCode });
     }
     const out: TAPIChatRoomGetDetailsResult = result[0];
-    return new Response(JSON.stringify(out), { status: 200 });
+    return new NextResponse(JSON.stringify(out), { status: 200 });
   } catch (error) {
     const err = error as Error;
     logger.error(

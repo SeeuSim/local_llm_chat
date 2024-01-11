@@ -1,8 +1,9 @@
+import { NextResponse } from 'next/server';
+
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
-import type { IAPIChatRoomCreateResponse } from './types';
 
-const _path = 'api/chat/room/create';
+import type { IAPIChatRoomCreateResponse } from './types';
 
 export async function POST(_req: Request) {
   try {
@@ -15,9 +16,9 @@ export async function POST(_req: Request) {
         id: room.id,
       };
 
-      return new Response(JSON.stringify(output), { status: 200 });
+      return new NextResponse(JSON.stringify(output), { status: 200 });
     }
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'An error occurred',
         rooms,
@@ -25,7 +26,7 @@ export async function POST(_req: Request) {
       { status: 500 }
     );
   } catch (error) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         error,
       }),
