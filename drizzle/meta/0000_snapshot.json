@@ -1,5 +1,5 @@
 {
-  "id": "d5b31353-30fe-48bd-8734-4aa780010851",
+  "id": "9ef7725b-f06c-4ce7-86a1-961e63d30ee0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -15,8 +15,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "createdTime": {
-          "name": "createdTime",
+        "created_time": {
+          "name": "created_time",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -106,8 +106,8 @@
         }
       },
       "indexes": {
-        "time_index": {
-          "name": "time_index",
+        "time_stamp_index": {
+          "name": "time_stamp_index",
           "columns": [
             "time_stamp"
           ],
@@ -152,15 +152,15 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "createdTime": {
-          "name": "createdTime",
+        "created_time": {
+          "name": "created_time",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
         },
-        "modifiedTime": {
-          "name": "modifiedTime",
+        "modified_time": {
+          "name": "modified_time",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -171,13 +171,20 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "truncate_index": {
+          "name": "truncate_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
         }
       },
       "indexes": {
-        "modifiedIndex": {
-          "name": "modifiedIndex",
+        "modified_time_index": {
+          "name": "modified_time_index",
           "columns": [
-            "modifiedTime"
+            "modified_time"
           ],
           "isUnique": false
         }
