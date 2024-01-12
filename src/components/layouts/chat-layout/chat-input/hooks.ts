@@ -194,10 +194,12 @@ export const useChatInputHooks = () => {
       payloadRoomId,
       message,
       files = [],
+      kbDocuments = [],
     }: {
       payloadRoomId: string;
       message: string;
       files?: File[];
+      kbDocuments?: string[];
     }) => {
       if (files.length) {
         setLoadingStage('Uploading files...');

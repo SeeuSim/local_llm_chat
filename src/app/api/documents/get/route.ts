@@ -12,16 +12,20 @@ export async function POST(req: Request) {
   const logger = getLogger(req);
   const params: IAPIDocumentsGetParams = await req.json();
 
-  if (!params || !params.roomId) {
+  if (!params) {
     return new Response(JSON.stringify({}), { status: 400 });
   }
 
   const column = EmbeddingsTable.metadata;
 
-  const filterParams: Pick<TChunkMetadata, 'roomKeys' | 'splitNumber'> = {
-    roomKeys: {
-      [params.roomId as string]: true,
-    },
+  const filterParams: Partial<Pick<TChunkMetadata, 'roomKeys' | 'splitNumber'>> = {
+    ...(params.roomId
+      ? {
+          roomKeys: {
+            [params.roomId as string]: true,
+          },
+        }
+      : {}),
     splitNumber: 1,
   };
 

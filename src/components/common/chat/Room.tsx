@@ -115,6 +115,7 @@ const Room = () => {
         body: JSON.stringify(payload),
       }).then((res) => res.json());
     },
+    enabled: roomId.length > 0,
   });
 
   useEffect(() => {

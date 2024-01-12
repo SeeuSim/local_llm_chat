@@ -5,15 +5,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { forwardRef, useContext } from 'react';
 
 import type { IAPIDocumentsLinkParams } from '@/app/api/documents/link/types';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
 
 import DarkModeToggle from './DarkModeToggle';
+import { LinkFilePopover } from './LinkFilePopover';
 import { Logo } from './Logo';
 import { MobileSideNav } from './MobileSideNav';
-import { Button } from '@/components/ui/button';
 
 export const NavBar = forwardRef<HTMLDivElement>((_props, ref) => {
   const queryClient = useQueryClient();
@@ -21,11 +22,11 @@ export const NavBar = forwardRef<HTMLDivElement>((_props, ref) => {
   const { documents } = useContext(chatRoomContext);
 
   const { mutate: linkUnlinkDocuments, isPending } = useMutation({
-    mutationFn: async (params: { isLinkUnlink: boolean; document: string }) => {
+    mutationFn: async (params: { isLinkUnlink: boolean; documents: string[] }) => {
       const payload: IAPIDocumentsLinkParams = {
         roomId,
         isLinkUnlink: params.isLinkUnlink,
-        documentTitles: [params.document],
+        documentTitles: params.documents,
       };
       return fetch('/api/documents/link', {
         method: 'POST',
@@ -52,7 +53,12 @@ export const NavBar = forwardRef<HTMLDivElement>((_props, ref) => {
           <MobileSideNav />
           <Logo />
         </div>
-        <div className='mx-auto flex flex-row gap-x-2'>
+        <div
+          className={cn(
+            'mx-auto flex flex-row gap-x-2 md:gap-x-1 lg:gap-x-2',
+            roomId.length === 0 && 'hidden'
+          )}
+        >
           {documents?.slice(0, 3).map((document, index) => (
             <div
               key={document}
@@ -81,7 +87,7 @@ export const NavBar = forwardRef<HTMLDivElement>((_props, ref) => {
                       onClick={() => {
                         linkUnlinkDocuments({
                           isLinkUnlink: false,
-                          document,
+                          documents: [document],
                         });
                       }}
                       className='m-0 h-min bg-transparent p-0 text-primary hover:bg-transparent hover:text-primary'
@@ -96,6 +102,11 @@ export const NavBar = forwardRef<HTMLDivElement>((_props, ref) => {
               </TooltipProvider>
             </div>
           ))}
+          <LinkFilePopover
+            isLinking={isPending}
+            documents={documents}
+            linkDocument={linkUnlinkDocuments}
+          />
         </div>
         <DarkModeToggle />
       </div>
