@@ -16,6 +16,8 @@ import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 
 import { ChatMessage } from './ChatMessage';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 const Room = () => {
   const searchParams = useSearchParams();
@@ -23,6 +25,8 @@ const Room = () => {
   const streamedRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<HTMLDivElement>(null);
   const {
+    knowledgeBase,
+    setKnowledgeBase,
     documents,
     setDocuments,
     messages,
@@ -116,6 +120,30 @@ const Room = () => {
       }).then((res) => res.json());
     },
     enabled: roomId.length > 0,
+  });
+
+  const { data: _knowledgeBaseDocuments } = useQuery<IAPIDocumentsGetResults>({
+    queryKey: ['app', 'documents'],
+    queryFn: async ({ signal }) => {
+      return await fetch(`/api/documents/get`, {
+        method: 'POST',
+        signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+        .then((res) => res.json())
+        .then((res: IAPIDocumentsGetResults) => {
+          setKnowledgeBase &&
+            setKnowledgeBase(
+              Object.fromEntries(res.documents.map((document) => [document, false]))
+            );
+
+          return res;
+        });
+    },
+    enabled: roomId === '',
   });
 
   useEffect(() => {
@@ -220,7 +248,52 @@ const Room = () => {
   ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
     // Empty Room
     // TODO: Add hero
-    <span>No messages here. Send some!</span>
+    <div className='flex min-w-[60vw] flex-col gap-2 p-4 xl:translate-x-[-5vw]'>
+      <span className='text-4xl font-bold'>What can I do for you today?</span>
+      <hr />
+      <div className='mt-2 flex w-full flex-col gap-4 lg:flex-row'>
+        <Card className='flex flex-1 flex-col gap-y-2 bg-secondary p-4 shadow-sm'>
+          <CardTitle className='text-2xl'>Talk to an uploaded file</CardTitle>
+          <CardDescription className='text-base'>
+            Here are your uploaded files. Select any one, send a message and start talking.
+          </CardDescription>
+          <div className='flex flex-wrap gap-2'>
+            {knowledgeBase &&
+              Object.entries(knowledgeBase).map(([title, isSelected]) => (
+                <div
+                  key={title}
+                  className={cn(
+                    'rounded-full bg-background px-2 py-1.5 hover:cursor-pointer hover:bg-border',
+                    isSelected &&
+                      'bg-secondary-foreground text-secondary hover:bg-secondary-foreground/80 hover:text-secondary'
+                  )}
+                  onClick={() => {
+                    setKnowledgeBase &&
+                      setKnowledgeBase((prev) => ({ ...prev, [title]: !prev[title] }));
+                  }}
+                >
+                  <span className='line-clamp-1 text-sm xl:text-base'>{title}</span>
+                </div>
+              ))}
+          </div>
+        </Card>
+        <Card className='flex flex-1 flex-col gap-y-2 bg-secondary p-4 shadow-sm'>
+          <CardTitle className='text-2xl'>Send a Message</CardTitle>
+          <CardDescription className='text-base'>
+            I can be your personal assistant. Here's a few things I can do:
+            <br />
+            <br />
+            - Generate Suggestions
+            <br />- Analyse text from your <b className='text-primary'>PDF upload</b>
+            <br />
+            - Write boilerplate code, and much more.
+            <br />
+            <br />
+            Send a message to find out!
+          </CardDescription>
+        </Card>
+      </div>
+    </div>
   ) : (
     !messages?.length &&
     (isFetching || isPending) && (
