@@ -7,7 +7,7 @@
     "build": "env-cmd -f .env.dev next build",
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",
-    "prepare": "husky install",
+    "prepare": "husky install && next telemetry disable",
     "fmt": "prettier --config ./.prettierrc \"**/*.{mts,ts,tsx,js}\" --write",
     "generate": "env-cmd -f .env.dev drizzle-kit generate:pg",
     "migrate": "env-cmd -f .env.dev tsx src/lib/db/migrate.mts",
