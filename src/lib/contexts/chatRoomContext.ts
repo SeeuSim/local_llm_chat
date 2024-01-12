@@ -30,6 +30,8 @@ export interface IChatRoomContext {
   setDocuments?: React.Dispatch<React.SetStateAction<TDocument[]>>;
   messages?: TMessage[];
   setMessages?: React.Dispatch<React.SetStateAction<TMessage[]>>;
+  knowledgeBase?: Record<string, boolean>;
+  setKnowledgeBase?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 
   // Dynamic Streaming
   streamed: string;

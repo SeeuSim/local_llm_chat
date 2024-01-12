@@ -1,13 +1,14 @@
 'use client';
 import { Link1Icon } from '@radix-ui/react-icons';
 import { UseMutateFunction, useQuery } from '@tanstack/react-query';
-import { ElementRef, forwardRef, useEffect, useState } from 'react';
+import { ElementRef, forwardRef, useContext, useEffect, useState } from 'react';
 
 import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 
 interface ILinkFilePopoverProps {
   documents?: Array<string>;
@@ -24,6 +25,7 @@ interface ILinkFilePopoverProps {
 
 export const LinkFilePopover = forwardRef<ElementRef<'button'>, ILinkFilePopoverProps>(
   ({ documents, linkDocument, isLinking }, ref) => {
+    const { knowledgeBase, setKnowledgeBase } = useContext(chatRoomContext);
     const [isOpen, setIsOpen] = useState(false);
     const { data: knowledgeBaseDocuments } = useQuery<IAPIDocumentsGetResults>({
       queryKey: ['app', 'documents'],
@@ -39,15 +41,15 @@ export const LinkFilePopover = forwardRef<ElementRef<'button'>, ILinkFilePopover
       },
       enabled: isOpen,
     });
-    const [linkedState, setLinked] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-      setLinked(
-        (documents ?? []).reduce((acc: Record<string, boolean>, curr) => {
-          acc[curr] = true;
-          return acc;
-        }, {})
-      );
+      setKnowledgeBase &&
+        setKnowledgeBase(
+          (documents ?? []).reduce((acc: Record<string, boolean>, curr) => {
+            acc[curr] = true;
+            return acc;
+          }, {})
+        );
     }, [documents]);
 
     return (
@@ -93,10 +95,11 @@ export const LinkFilePopover = forwardRef<ElementRef<'button'>, ILinkFilePopover
                 key={document}
                 className={cn(
                   'rounded-full bg-muted px-3 py-1.5 text-xs hover:cursor-pointer',
-                  linkedState[document] && 'bg-primary text-primary-foreground'
+                  knowledgeBase?.[document] && 'bg-primary text-primary-foreground'
                 )}
                 onClick={() => {
-                  setLinked((prev) => ({ ...prev, [document]: !prev[document] }));
+                  setKnowledgeBase &&
+                    setKnowledgeBase((prev) => ({ ...prev, [document]: !prev[document] }));
                 }}
               >
                 <span className='line-clamp-1'>{document}</span>
@@ -114,13 +117,13 @@ export const LinkFilePopover = forwardRef<ElementRef<'button'>, ILinkFilePopover
                 if (linkDocument) {
                   linkDocument({
                     isLinkUnlink: true,
-                    documents: Object.entries(linkedState)
+                    documents: Object.entries(knowledgeBase ?? {})
                       .filter(([_title, linked]) => linked)
                       .map(([title, _linked]) => title),
                   });
                   linkDocument({
                     isLinkUnlink: false,
-                    documents: Object.entries(linkedState)
+                    documents: Object.entries(knowledgeBase ?? {})
                       .filter(([_title, linked]) => !linked)
                       .map(([title, _linked]) => title),
                   });
