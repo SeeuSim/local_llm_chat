@@ -3,22 +3,19 @@ RUN apk update
 RUN apk --no-cache upgrade
 RUN apk add --no-cache libc6-compat
 
-FROM base as depsbuild
-RUN yarn global add pnpm
-
-FROM depsbuild as deps
+FROM base as deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm i --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm i 
 
-FROM depsbuild as builder
+FROM base as builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN npm run build
 # ARG ENV
 # RUN pnpm build:$ENV
-RUN pnpm next telemetry disable
+RUN npm run next telemetry disable
 
 FROM base as runner
 WORKDIR /app
