@@ -1,4 +1,4 @@
-FROM node:18.19-alpine3.18 as base
+FROM node:20-alpine3.18 as base
 RUN apk update
 RUN apk --no-cache upgrade
 RUN apk add --no-cache libc6-compat
@@ -6,7 +6,7 @@ RUN apk add --no-cache libc6-compat
 FROM base as deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm i 
+RUN npm install 
 
 FROM base as builder
 WORKDIR /app
