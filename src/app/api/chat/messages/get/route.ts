@@ -2,9 +2,9 @@ import { asc, eq, sql } from 'drizzle-orm';
 
 import PgInstance from '@/lib/db/dbInstance';
 import { MessagesTable } from '@/lib/db/schema';
+import { formatLoggerMessage, getLogger } from '@/lib/log';
 
 import type { IAPIChatMessagesGetOutput, IAPIChatMessagesGetParams } from './types';
-import { formatLoggerMessage, getLogger } from '@/lib/log';
 
 const PATH = 'api/chat/messages/get';
 

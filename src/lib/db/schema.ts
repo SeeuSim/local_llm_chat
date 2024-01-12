@@ -67,5 +67,6 @@ export const EmbeddingsTable = pgTable(EmbeddingsTableConf.name, {
   createdTime: timestamp('created_time').defaultNow(),
   content: text(EmbeddingsTableConf.columns.content.name),
   metadata: jsonb(EmbeddingsTableConf.columns.metadata.name).$type<TChunkMetadata>(),
-  embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),
+  embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 384 }),
+  // embedding: customVector(EmbeddingsTableConf.columns.embedding.name, { dimensions: 768 }),
 });

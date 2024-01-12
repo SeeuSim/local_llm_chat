@@ -1,8 +1,10 @@
+import { eq, sql } from 'drizzle-orm';
+
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
 import { formatLoggerMessage, getLogger } from '@/lib/log';
-import { eq, sql } from 'drizzle-orm';
-import { IAPIChatRoomGetDetailsParams, TAPIChatRoomGetDetailsResult } from './types';
+
+import type { IAPIChatRoomGetDetailsParams, TAPIChatRoomGetDetailsResult } from './types';
 
 const PATH = 'api/chat/room/get/details';
 

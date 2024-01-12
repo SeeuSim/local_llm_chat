@@ -1,6 +1,7 @@
+import { StringOutputParser } from 'langchain/schema/output_parser';
+
 import { formatLoggerMessage, getLogger } from '@/lib/log';
 import ChatOllamaSingleton from '@/lib/models/chat/chatOllama';
-import { StringOutputParser } from 'langchain/schema/output_parser';
 import {
   PROMPT_REGEXES,
   PROMPT_SUMMARISATION_TEMPLATES,

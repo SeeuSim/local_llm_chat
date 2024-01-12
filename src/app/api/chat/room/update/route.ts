@@ -3,7 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
 import { formatLoggerMessage, getLogger } from '@/lib/log';
-import { TAPIChatRoomUpdateParams } from './types';
+import type { TAPIChatRoomUpdateParams } from './types';
 
 const PATH = 'api/chat/room/update';
 

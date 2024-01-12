@@ -26,6 +26,7 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
   const queryClient = useQueryClient();
   const { roomId } = useContext(searchParamsRoomIdContext);
   const invokeController = useRef(new AbortController());
+  const [knowledgeBase, setKnowledgeBase] = useState<Record<string, boolean>>({});
   const [documents, setDocuments] = useState<Array<TDocument>>([]);
   const [messages, setMessages] = useState<Array<TMessage>>([]);
   const [streamed, setStreamed] = useState('');
@@ -71,6 +72,8 @@ const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
         // Room Meta
         documents,
         setDocuments,
+        knowledgeBase,
+        setKnowledgeBase,
         messages,
         setMessages,
         details: roomDetails,

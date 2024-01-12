@@ -1,7 +1,9 @@
+import { desc } from 'drizzle-orm';
+
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
+
 import { IAPIChatRoomGetOutput } from './types';
-import { desc } from 'drizzle-orm';
 
 export async function POST(req: Request) {
   try {

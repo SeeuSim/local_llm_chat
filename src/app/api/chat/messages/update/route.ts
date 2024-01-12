@@ -1,7 +1,9 @@
-import PgInstance from '@/lib/db/dbInstance';
-import { IAPIChatMessagesUpdateParams } from './types';
-import { MessagesTable } from '@/lib/db/schema';
 import { eq, sql } from 'drizzle-orm';
+
+import PgInstance from '@/lib/db/dbInstance';
+import { MessagesTable } from '@/lib/db/schema';
+
+import { IAPIChatMessagesUpdateParams } from './types';
 
 export async function POST(req: Request) {
   const params: IAPIChatMessagesUpdateParams = await req.json();

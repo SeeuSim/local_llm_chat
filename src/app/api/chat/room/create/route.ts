@@ -1,8 +1,7 @@
 import PgInstance from '@/lib/db/dbInstance';
 import { RoomTable } from '@/lib/db/schema';
-import type { IAPIChatRoomCreateResponse } from './types';
 
-const _path = 'api/chat/room/create';
+import type { IAPIChatRoomCreateResponse } from './types';
 
 export async function POST(_req: Request) {
   try {
