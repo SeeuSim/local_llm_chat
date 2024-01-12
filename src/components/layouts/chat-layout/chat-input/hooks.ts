@@ -10,8 +10,9 @@ import type { IAPIChatMessagesCreateParams } from '@/app/api/chat/messages/creat
 import { IAPIChatMessagesUpdateParams } from '@/app/api/chat/messages/update/types';
 import type { IAPIChatRoomCreateResponse } from '@/app/api/chat/room/create/types';
 
-import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
+import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { IAPIDocumentsLinkParams } from '@/app/api/documents/link/types';
 
 export const useChatInputHooks = () => {
   const { push } = useRouter();
@@ -22,6 +23,8 @@ export const useChatInputHooks = () => {
   const {
     invokeController,
     details: roomDetails,
+    knowledgeBase,
+    setKnowledgeBase,
     documents,
     messages,
     streamed,
@@ -221,10 +224,33 @@ export const useChatInputHooks = () => {
         toast({ title: 'Files uploaded! Submitting to model...' });
       }
 
+      if (kbDocuments.length) {
+        setLoadingStage('Linking documents...');
+        const payload: IAPIDocumentsLinkParams = {
+          isLinkUnlink: true,
+          documentTitles: kbDocuments,
+          roomId: payloadRoomId,
+        };
+        const linkResponse = await fetch('/api/documents/link', {
+          method: 'POST',
+          signal: controller.signal,
+          body: JSON.stringify(payload),
+        });
+        if (!linkResponse.ok) {
+          const response = await linkResponse.text();
+          throw new Error(response);
+        }
+        setKnowledgeBase &&
+          setKnowledgeBase((prev) =>
+            Object.fromEntries(Object.keys(prev).map((key) => [key, false]))
+          );
+        setLoadingStage('Files linked.');
+      }
+
       const filesPayload =
-        files.length > 0
+        files.length > 0 || kbDocuments.length > 0
           ? {
-              documentTitles: files.map((file) => file.name),
+              documentTitles: [...files.map((file) => file.name), ...kbDocuments],
             }
           : {};
 
@@ -307,7 +333,14 @@ export const useChatInputHooks = () => {
         return;
       }
       if (textAreaRef.current?.value) {
-        submitPayload({ payloadRoomId: data.id, message: textAreaRef.current.value, files });
+        submitPayload({
+          payloadRoomId: data.id,
+          message: textAreaRef.current.value,
+          files,
+          kbDocuments: Object.entries(knowledgeBase ?? {})
+            .filter(([_title, isSelected]) => isSelected)
+            .map(([title, _isSelected]) => title),
+        });
         resetTextField();
         push(`/chat/${data.id}?initial=true`);
       }
