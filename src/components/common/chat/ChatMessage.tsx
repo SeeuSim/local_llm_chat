@@ -52,7 +52,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
         }
         updateRoom({
           id: roomId,
-          truncateIndexes: Array.from(updatedIndexes).sort(),
+          truncateIndexes: Array.from(updatedIndexes),
         });
       }
     };

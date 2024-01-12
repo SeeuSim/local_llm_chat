@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       .set({
         ...(params.id && params.summary
           ? { id: params.id, summary: params.summary }
-          : { truncateIndexes: params.truncateIndexes }),
+          : { truncateIndexes: params.truncateIndexes?.toSorted((a, b) => a - b) }),
         modifiedTime: new Date(),
       })
       .where(eq(RoomTable.id, sql`${params.id}::uuid`))
