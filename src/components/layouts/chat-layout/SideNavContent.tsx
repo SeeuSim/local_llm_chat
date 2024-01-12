@@ -49,7 +49,12 @@ export const SideNavContent = () => {
         <div className='mt-2 flex flex-col gap-2'>
           {roomData && roomData.rooms
             ? roomData.rooms.map((room, index) => (
-                <RoomLink key={index} id={room.id as string} summary={room.summary ?? ''} />
+                <RoomLink
+                  key={index}
+                  id={room.id as string}
+                  summary={room.summary ?? ''}
+                  lastModified={room.modifiedTime ?? undefined}
+                />
               ))
             : (isLoading || isPending) && (
                 <div className='mx-auto flex flex-col gap-2'>
