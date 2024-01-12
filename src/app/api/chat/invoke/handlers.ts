@@ -26,7 +26,7 @@ export const BaseQuestionHandler = async (question: string, signal: AbortSignal)
 
   const ollama = await ChatOllamaSingleton.getInstance();
   if (signal) {
-    ollama.CallOptions = { ...(ollama.CallOptions ?? {}), signal };
+    ollama.ParsedCallOptions = { ...(ollama.ParsedCallOptions ?? {}), signal };
   }
 
   const chain = prompt.pipe(ollama).pipe(new StringOutputParser());
@@ -62,7 +62,7 @@ export const ChatHistoryHandler = async (
 
   const model = await ChatOllamaSingleton.getInstance();
   if (signal) {
-    model.CallOptions = { ...(model.CallOptions ?? {}), signal };
+    model.ParsedCallOptions = { ...(model.ParsedCallOptions ?? {}), signal };
   }
 
   const chain = RunnableSequence.from([
@@ -93,7 +93,7 @@ export const BaseDocumentHandler = async (
 
   const model = await ChatOllamaSingleton.getInstance();
   if (signal) {
-    model.CallOptions = { ...(model.CallOptions ?? {}), signal };
+    model.ParsedCallOptions = { ...(model.ParsedCallOptions ?? {}), signal };
   }
 
   const fullChain = RunnableSequence.from([
@@ -122,7 +122,7 @@ export const ChatDocumentHandler = async (
 
   const model = await ChatOllamaSingleton.getInstance();
   if (signal) {
-    // model.CallOptions = { ...model.CallOptions ?? {}, signal };
+    // model.ParsedCallOptions = { ...model.ParsedCallOptions ?? {}, signal };
   }
 
   const retrievalChain = RunnableSequence.from([
