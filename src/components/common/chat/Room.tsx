@@ -1,5 +1,6 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
+import { TrashIcon } from '@radix-ui/react-icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useRef } from 'react';
 
@@ -9,18 +10,22 @@ import type {
 } from '@/app/api/chat/messages/get/types';
 import type { IAPIDocumentsGetResults } from '@/app/api/documents/get/types';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/components/ui/use-toast';
 
 import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
+import { cn } from '@/lib/utils';
 
 import { ChatMessage } from './ChatMessage';
-import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { IAPIDocumentsDeleteParams } from '@/app/api/documents/delete/types';
 
 const Room = () => {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const { roomId } = useContext(searchParamsRoomIdContext);
   const streamedRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<HTMLDivElement>(null);
@@ -146,6 +151,27 @@ const Room = () => {
     enabled: roomId === '',
   });
 
+  const { mutate: deleteDocument, isPending: isDeletePending } = useMutation({
+    mutationKey: ['documents', 'delete'],
+    mutationFn: async (params: { title: string }) => {
+      const payload: IAPIDocumentsDeleteParams = {
+        documentTitle: params.title,
+      };
+      return await fetch('/api/documents/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: (response, _vars, _context) => {
+      if (response.ok) {
+        queryClient.refetchQueries({ queryKey: ['app', 'documents'] });
+      }
+    },
+  });
+
   useEffect(() => {
     if (setDocuments && roomDocuments !== undefined && Array.isArray(roomDocuments.documents)) {
       setDocuments(roomDocuments.documents);
@@ -260,20 +286,44 @@ const Room = () => {
           <div className='flex flex-wrap gap-2'>
             {knowledgeBase &&
               Object.entries(knowledgeBase).map(([title, isSelected]) => (
-                <div
-                  key={title}
-                  className={cn(
-                    'rounded-full bg-background px-2 py-1.5 hover:cursor-pointer hover:bg-border',
-                    isSelected &&
-                      'bg-secondary-foreground text-secondary hover:bg-secondary-foreground/80 hover:text-secondary'
-                  )}
-                  onClick={() => {
-                    setKnowledgeBase &&
-                      setKnowledgeBase((prev) => ({ ...prev, [title]: !prev[title] }));
-                  }}
-                >
-                  <span className='line-clamp-1 text-sm xl:text-base'>{title}</span>
-                </div>
+                <TooltipProvider key={title}>
+                  <Tooltip delayDuration={100}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={cn(
+                          'group flex flex-row items-center gap-2 rounded-full border border-border bg-background px-2 py-1.5 hover:cursor-pointer hover:bg-border dark:border-none',
+                          isSelected &&
+                            'bg-secondary-foreground text-secondary hover:bg-secondary-foreground/80 hover:text-secondary',
+                          isDeletePending && 'cursor-not-allowed'
+                        )}
+                        onClick={() => {
+                          setKnowledgeBase &&
+                            !isDeletePending &&
+                            setKnowledgeBase((prev) => ({ ...prev, [title]: !prev[title] }));
+                        }}
+                      >
+                        <span className='line-clamp-1 flex-1 text-sm xl:text-base'>{title}</span>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={100}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                disabled={isDeletePending}
+                                onClick={() => deleteDocument({ title })}
+                                className='hidden h-min w-min bg-transparent p-0 shadow-none group-hover:flex hover:bg-transparent hover:text-red-600'
+                              >
+                                <TrashIcon className='h-5 w-5 text-red-500 hover:scale-110' />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Remove this document from the knowledge base.
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>{title}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ))}
           </div>
         </Card>

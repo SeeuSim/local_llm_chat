@@ -1,7 +1,10 @@
 'use client';
 
 import { DotsVerticalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
+import { useContext, useEffect, useState } from 'react';
 
+import { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
 import { buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,24 +12,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
-import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
-import { useSearchParams } from 'next/navigation';
-import { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { IAPIChatRoomDeleteParams } from '@/app/api/chat/room/delete/types';
+import { useRouter } from 'next/navigation';
 
 interface IRoomLinkProps {
   id: string;
   summary: string;
   // TBC
-  lastModified?: any;
+  lastModified?: Date;
 }
 
-export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
-  const searchParams = useSearchParams();
+export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLinkProps) => {
+  const router = useRouter();
   const { roomId } = useContext(searchParamsRoomIdContext);
+  const queryClient = useQueryClient();
   const { messages } = useContext(chatRoomContext);
 
   const [streamedSummary, setStreamedSummary] = useState(summary);
@@ -95,6 +98,29 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
     }
   }, [messages, roomId, summary]);
 
+  const { mutate: deleteRoom, isPending: isDeletePending } = useMutation({
+    mutationKey: ['room', 'delete', roomId],
+    mutationFn: async () => {
+      const payload: IAPIChatRoomDeleteParams = {
+        roomId,
+      };
+      return await fetch('/api/chat/room/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess(response, _variables, _context) {
+      if (response.ok) {
+        queryClient
+          .refetchQueries({
+            queryKey: ['chat', 'rooms', 'get', ''],
+          })
+          .then((_res) => router.push('/'));
+      }
+    },
+  });
+
   return (
     <Link
       href={`/chat/${id}`}
@@ -108,11 +134,12 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
       <div className='flex w-28 flex-row gap-0.5 whitespace-nowrap md:w-36'>
         <span className='flex-1 overflow-hidden text-xs font-normal'>{streamedSummary}</span>
         <DropdownMenu>
-          <DropdownMenuTrigger className='flex'>
+          <DropdownMenuTrigger disabled={isDeletePending} className='flex'>
             <DotsVerticalIcon />
           </DropdownMenuTrigger>
           <DropdownMenuContent className='flex flex-col'>
             <DropdownMenuItem
+              disabled
               className={cn(
                 'inline-flex items-center gap-3 text-sm',
                 'hover:cursor-pointer focus-visible:cursor-pointer'
@@ -122,9 +149,11 @@ export const RoomLink = ({ id, summary }: IRoomLinkProps) => {
               <span>Rename</span>
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={isDeletePending}
+              onClick={() => deleteRoom()}
               className={cn(
-                'inline-flex items-center gap-3 text-sm text-destructive',
-                'focus:cursor-pointer focus:bg-destructive-foreground focus:text-destructive'
+                'inline-flex items-center gap-3 text-sm text-red-500',
+                'focus:cursor-pointer focus:bg-red-500/20 focus:text-red-500'
               )}
             >
               <TrashIcon />
