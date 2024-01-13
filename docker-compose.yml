@@ -26,6 +26,7 @@ services:
       PGDATA: "/data/llmchat-db"
     volumes:
        - "llmchat-db-docker:/data/llmchat-db"
+       - ./.local/cluster/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5431:5432"
     restart: unless-stopped
