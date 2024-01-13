@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "env-cmd -f .env.dev next dev | pino-pretty",
-    "build:dev": "env-cmd -f .env.dev next build",
-    "start:dev": "env-cmd -f .env.dev next start",
-    "build": "env-cmd -f .env.prod next build",
+    "build:prod": "env-cmd -f .env.prod next build",
+    "start:prod": "env-cmd -f .env.prod next start",
+    "build": "env-cmd -f .env.dev next build",
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",
     "prepare": "husky install && next telemetry disable",

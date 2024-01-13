@@ -24,9 +24,11 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps --link /app/node_modules ./node_modules
 COPY --link  . .
+
+# We only use .env.prod
 RUN rm .env.dev
 
-RUN npm run build
+RUN npm run build:prod
 
 # Production image, copy all the files and run next
 FROM base AS runner
