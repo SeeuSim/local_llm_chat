@@ -291,7 +291,9 @@ export const useChatInputHooks = () => {
       if (roomId) {
         queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
         queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        queryClient.refetchQueries({ queryKey: ['chat', 'documents', 'get', roomId] });
+        setTimeout(() => {
+          queryClient.refetchQueries({ queryKey: ['chat', 'documents', 'get', roomId] });
+        }, 1000);
 
         const truncateIndex =
           roomDetails?.truncateIndexes &&
