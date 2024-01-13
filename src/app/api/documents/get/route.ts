@@ -12,6 +12,8 @@ export async function POST(req: Request) {
   const logger = getLogger(req);
   const params: IAPIDocumentsGetParams = await req.json();
 
+  logger.info({ req, results: { host: process.env.DB_HOST, port: process.env.DB_PORT } });
+
   if (!params) {
     return new Response(JSON.stringify({}), { status: 400 });
   }

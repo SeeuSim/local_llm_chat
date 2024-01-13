@@ -1,17 +1,19 @@
 services:
-  # NOTICE: NextJS 14 build in alpine container erroring for now [12-01]
-  # ui:
-  #   build: 
-  #     context: .
-  #     dockerfile: ./Dockerfile
-  #   image: "locallm-webui"
-  #   container_name: "locallm-webui"
-  #   ports:
-  #     - "3000:3000"
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - postgres
+  ui:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    image: "locallm-webui"
+    container_name: "locallm-webui"
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    links: 
+      - postgres
   postgres:
+    hostname: postgres
     build:
       context: .
       dockerfile: ./.local/cluster/postgres.Dockerfile

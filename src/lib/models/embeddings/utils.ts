@@ -29,7 +29,6 @@ export const processPDFFiles: (
   return await Promise.all(
     files.map((file) =>
       new PDFLoader(file, { splitPages: file.size > 500_000 }).load().then((docs) => {
-        console.log(docs);
         return docs.map((doc) => ({
           ...doc,
           metadata: {
