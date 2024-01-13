@@ -1,9 +1,11 @@
+setup:
+	npm install \
+	&& npm run prepare
+
 up: 
 	./.local/scripts/start.sh \
 	&& sleep 1 \
-	&& npm run migrate \
-	&& npm run build:dev \
-	&& npm run start:dev
+	&& npm run migrate
 
 down: 
 	docker compose down
