@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "env-cmd -f .env.dev next dev | pino-pretty",
+    "build:prod": "env-cmd -f .env.prod next build",
+    "start:prod": "env-cmd -f .env.prod next start",
     "build": "env-cmd -f .env.dev next build",
     "start": "env-cmd -f .env.dev next start",
     "lint": "next lint",

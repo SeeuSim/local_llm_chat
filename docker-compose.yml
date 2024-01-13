@@ -1,5 +1,4 @@
 services:
-  # NOTICE: NextJS 14 build in alpine container erroring for now [12-01]
   # ui:
   #   build: 
   #     context: .
@@ -11,7 +10,10 @@ services:
   #   restart: unless-stopped
   #   depends_on:
   #     - postgres
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
   postgres:
+    hostname: postgres
     build:
       context: .
       dockerfile: ./.local/cluster/postgres.Dockerfile
@@ -24,9 +26,19 @@ services:
       PGDATA: "/data/llmchat-db"
     volumes:
        - "llmchat-db-docker:/data/llmchat-db"
+       - ./.local/cluster/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5431:5432"
     restart: unless-stopped
+  # ollama:
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   container_name: ollama
+  #   pull_policy: always
+  #   tty: true
+  #   restart: unless-stopped
+  #   image: ollama/ollama:latest
 volumes:
+    # ollama: {}
     llmchat-db-docker:
       external: true

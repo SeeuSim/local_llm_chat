@@ -3,18 +3,23 @@ var path = require('path');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'standalone',
-  staticPageGenerationTimeout: 180,
-  async rewrites() {
-    return [
-      {
-        source: '/pathA',
-        destination: 'https://google.com',
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/pathA',
+  //       destination: 'https://google.com',
+  //     },
+  //   ];
+  // },
   env: {
     NEXT_PUBLIC_VAR_ONE: process.env.NEXT_PUBLIC_VAR_ONE,
     VAR_ONE: process.env.VAR_ONE,
+    DB_HOST: process.env.DB_HOST,
+    DB_PORT: process.env.DB_PORT,
+    DB_NAME: process.env.DB_NAME,
+    DB_USER: process.env.DB_USER,
+    DB_PASSWORD: process.env.DB_PASSWORD,
+    OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL,
   },
   eslint: {
     dirs: ['.'],
