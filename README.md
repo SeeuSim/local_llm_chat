@@ -15,7 +15,7 @@ LLMs are run locally using [Ollama](https://ollama.ai).
 
 ## Table of Contents 📚
 
-- [Features]
+- [Features](#features)
 - [Setup](#setup)
 - [Configurations and Considerations](#configurations-and-considerations)
   - [Embeddings Models](#embeddings-models)
