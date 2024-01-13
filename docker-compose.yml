@@ -1,17 +1,17 @@
 services:
-  ui:
-    build: 
-      context: .
-      dockerfile: ./Dockerfile
-    image: "locallm-webui"
-    container_name: "locallm-webui"
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    links: 
-      - postgres
+  # ui:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   image: "locallm-webui"
+  #   container_name: "locallm-webui"
+  #   ports:
+  #     - "3000:3000"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
   postgres:
     hostname: postgres
     build:
@@ -29,6 +29,15 @@ services:
     ports:
       - "5431:5432"
     restart: unless-stopped
+  # ollama:
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   container_name: ollama
+  #   pull_policy: always
+  #   tty: true
+  #   restart: unless-stopped
+  #   image: ollama/ollama:latest
 volumes:
+    # ollama: {}
     llmchat-db-docker:
       external: true

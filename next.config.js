@@ -2,8 +2,7 @@ var path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
-  staticPageGenerationTimeout: 100,
+  // output: 'standalone',
   // async rewrites() {
   //   return [
   //     {
