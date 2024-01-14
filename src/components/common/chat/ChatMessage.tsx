@@ -90,7 +90,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, IChatMessageProps>(
                   className={cn(
                     'prose prose-neutral text-sm text-primary-foreground',
                     'prose-a:text-blue-500 prose-code:text-secondary-foreground prose-pre:ml-2 prose-pre:bg-transparent prose-pre:p-0',
-                    'prose-strong:text-primary',
+                    'prose-headings:text-primary prose-strong:text-primary',
                     role === 'system' && 'text-muted-foreground'
                   )}
                 >

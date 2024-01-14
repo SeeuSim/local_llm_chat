@@ -26,7 +26,11 @@ interface IRoomLinkProps {
   lastModified?: Date;
 }
 
-export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLinkProps) => {
+export const RoomLink = ({
+  id: actualRoomId,
+  summary,
+  lastModified: _modifiedTime,
+}: IRoomLinkProps) => {
   const router = useRouter();
   const { roomId } = useContext(searchParamsRoomIdContext);
   const queryClient = useQueryClient();
@@ -87,7 +91,7 @@ export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLink
   };
 
   useEffect(() => {
-    if (roomId === id && messages && messages.length && !summary) {
+    if (roomId === actualRoomId && messages && messages.length && !summary) {
       if (messages.length < 2) {
         return;
       }
@@ -100,9 +104,9 @@ export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLink
 
   const { mutate: deleteRoom, isPending: isDeletePending } = useMutation({
     mutationKey: ['room', 'delete', roomId],
-    mutationFn: async () => {
+    mutationFn: async ({ roomToDeleteId }: { roomToDeleteId: string }) => {
       const payload: IAPIChatRoomDeleteParams = {
-        roomId,
+        roomId: roomToDeleteId,
       };
       return await fetch('/api/chat/room/delete', {
         method: 'POST',
@@ -114,7 +118,7 @@ export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLink
       if (response.ok) {
         queryClient
           .refetchQueries({
-            queryKey: ['chat', 'rooms', 'get', ''],
+            queryKey: ['chat', 'rooms', 'get'],
           })
           .then((_res) => router.push('/'));
       }
@@ -123,12 +127,16 @@ export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLink
 
   return (
     <Link
-      href={`/chat/${id}`}
+      href={`/chat/${actualRoomId}`}
+      onClick={() => {
+        queryClient.refetchQueries({ queryKey: ['chat', 'rooms', 'get'] });
+      }}
       className={cn(
         buttonVariants({ variant: 'link' }),
         'group w-full rounded-md px-2 py-1.5 hover:no-underline',
         'hover:cursor-pointer hover:bg-secondary',
-        roomId === id && 'bg-primary text-primary-foreground hover:bg-secondary-foreground'
+        roomId === actualRoomId &&
+          'bg-primary text-primary-foreground hover:bg-secondary-foreground'
       )}
     >
       <div className='flex w-28 flex-row gap-0.5 whitespace-nowrap md:w-36'>
@@ -150,7 +158,11 @@ export const RoomLink = ({ id, summary, lastModified: _modifiedTime }: IRoomLink
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={isDeletePending}
-              onClick={() => deleteRoom()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteRoom({ roomToDeleteId: actualRoomId });
+              }}
               className={cn(
                 'inline-flex items-center gap-3 text-sm text-red-500',
                 'focus:cursor-pointer focus:bg-red-500/20 focus:text-red-500'
