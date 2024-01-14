@@ -288,27 +288,26 @@ export const useChatInputHooks = () => {
       });
     },
     onSuccess: (_response, vars, _context) => {
-      if (roomId) {
-        queryClient.invalidateQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        queryClient.refetchQueries({ queryKey: ['chat', 'messages', 'get', roomId] });
-        setTimeout(() => {
-          queryClient.refetchQueries({ queryKey: ['chat', 'documents', 'get', roomId] });
-        }, 1000);
+      queryClient.refetchQueries({
+        queryKey: ['chat', 'messages', 'get', vars.payloadRoomId ?? roomId],
+      });
+      queryClient.refetchQueries({
+        queryKey: ['chat', 'documents', 'get', vars.payloadRoomId ?? roomId],
+      });
 
-        const truncateIndex =
-          roomDetails?.truncateIndexes &&
-          Array.isArray(roomDetails.truncateIndexes) &&
-          roomDetails.truncateIndexes.length > 0
-            ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
-            : 0;
+      const truncateIndex =
+        roomDetails?.truncateIndexes &&
+        Array.isArray(roomDetails.truncateIndexes) &&
+        roomDetails.truncateIndexes.length > 0
+          ? roomDetails.truncateIndexes[roomDetails.truncateIndexes.length - 1]
+          : 0;
 
-        invoke(
-          textAreaRef.current?.value as string,
-          (documents !== undefined && documents.length > 0) ||
-            (vars.files !== undefined && vars.files?.length !== 0),
-          messages?.slice(truncateIndex) ?? []
-        );
-      }
+      invoke(
+        textAreaRef.current?.value as string,
+        (documents !== undefined && documents.length > 0) ||
+          (vars.files !== undefined && vars.files?.length !== 0),
+        messages?.slice(truncateIndex) ?? []
+      );
     },
   });
 

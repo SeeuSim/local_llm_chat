@@ -98,7 +98,7 @@ const Room = () => {
         body: JSON.stringify(payload),
       }).then((res) => res.json());
     },
-    enabled: roomId !== undefined && roomId.length > 0,
+    enabled: roomId.length > 0,
     refetchInterval: (_query) => {
       if (
         searchParams.get('initial') &&
@@ -271,7 +271,7 @@ const Room = () => {
         })}
       <div className='h-0 w-0' ref={lastRef} />
     </>
-  ) : roomId.length > 0 !== (isFetching || isPending) && messages?.length === 0 ? (
+  ) : roomId.length === 0 ? (
     // Empty Room
     // TODO: Add hero
     <div className='flex min-w-[60vw] flex-col gap-2 p-4 xl:translate-x-[-5vw]'>
