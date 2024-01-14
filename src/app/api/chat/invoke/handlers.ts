@@ -11,7 +11,6 @@ import {
   chatHistoryReflectTemplate,
   baseDocumentQATemplate,
   chatDocumentQATemplate,
-  formatChatHistoryBasePairTemplate,
 } from './templates';
 import type { TChatMessage } from './types';
 
@@ -33,20 +32,45 @@ export const BaseQuestionHandler = async (question: string, signal: AbortSignal)
   return chain.stream({ question });
 };
 
-const formatChatTrain = (chatHistory: Array<TChatMessage>) => {
-  return chatHistory
-    .reduce(
-      (result, _value, index, sourceArray) =>
-        index % 2 === 0 ? [...result, sourceArray.slice(index, index + 2)] : result,
-      [] as Array<Array<TChatMessage>>
-    )
-    .map(([userMessage, systemMessage]) =>
-      formatChatHistoryBasePairTemplate(
-        userMessage.content as string,
-        systemMessage.content as string
-      )
-    )
-    .join('\r\n');
+const formatChatHistory: (messages: Array<TChatMessage>) => string = (messages) => {
+  if (messages.length === 0) {
+    return '';
+  }
+  if (messages.length === 1) {
+    const message = messages[0];
+    if (message.persona === 'user') {
+      return `
+        <S>
+          [INST]
+          ${message.content}
+          [/INST]
+        </s>`.trim();
+    }
+    return `
+    <s>
+      ${message.content}
+    </s>`.trim();
+  }
+  const [firstMessage, secondMessage, ...otherMessages] = messages;
+
+  if (firstMessage.persona === 'user' && secondMessage.persona === 'system') {
+    // Regular pair
+    return (
+      `<s>
+      [INST]
+      ${firstMessage.content}
+      [/INST]
+      ${secondMessage.content}
+      </s>`.trim() +
+      '\r\n' +
+      formatChatHistory(otherMessages)
+    );
+  }
+  return (
+    formatChatHistory([firstMessage]) +
+    '\r\n' +
+    formatChatHistory([secondMessage, ...otherMessages])
+  );
 };
 
 export const ChatHistoryHandler = async (
@@ -68,7 +92,7 @@ export const ChatHistoryHandler = async (
   const chain = RunnableSequence.from([
     {
       question: (input) => input.question,
-      history: RunnableSequence.from([(input) => input.chat_history, formatChatTrain]),
+      history: RunnableSequence.from([(input) => input.chat_history, formatChatHistory]),
     },
     prompt,
     model,
@@ -122,7 +146,7 @@ export const ChatDocumentHandler = async (
 
   const model = await ChatOllamaSingleton.getInstance();
   if (signal) {
-    // model.ParsedCallOptions = { ...model.ParsedCallOptions ?? {}, signal };
+    model.ParsedCallOptions = { ...(model.ParsedCallOptions ?? {}), signal };
   }
 
   const retrievalChain = RunnableSequence.from([
@@ -136,7 +160,7 @@ export const ChatDocumentHandler = async (
   const fullChain = RunnableSequence.from([
     {
       question: (input) => input.question,
-      history: RunnableSequence.from([(input) => input.chat_history, formatChatTrain]),
+      history: RunnableSequence.from([(input) => input.chat_history, formatChatHistory]),
       context: RunnableSequence.from([
         (input) => {
           return {

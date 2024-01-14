@@ -5,18 +5,8 @@ export const baseTemplate = `
 
 export const baseChatHistoryTemplate = `
 {history}
-[INST]
-{question}
-[/INST]`.trim();
-
-export const formatChatHistoryBasePairTemplate = (userMessage: string, systemMessage: string) =>
-  `
-<s>
-[INST]
-${userMessage}
-[/INST]
-${systemMessage}
-</s>`.trim();
+${baseTemplate}
+`.trim();
 
 // QA with documents
 
@@ -29,16 +19,14 @@ ${systemMessage}
  * - `question`: The user's last question
  */
 export const chatHistoryReflectTemplate =
-  `<s>
-  [INST]
+  `[INST]
   Given the following conversation and a follow up question, ` +
   `rephrase the follow up question to be a standalone question.\r\n\r\n` +
   `Chat History:\r\n` +
   `{chat_history}\r\n\r\n` +
   `Follow Up Input: {question}\r\n\r\n` +
   `Standalone Question:
-  [/INST]
-  </s>`;
+  [/INST]`;
 
 export const documentQATemplate =
   `You are an experienced researcher, expert at interpreting ` +
