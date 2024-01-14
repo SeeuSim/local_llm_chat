@@ -2,8 +2,10 @@ import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddin
 
 const getHuggingFaceEmbeddings = () =>
   class HuggingFaceEmbeddingSingleton {
-    // static model = 'Xenova/gte-base';
-    static model = 'Xenova/all-MiniLM-L6-v2';
+    // static model = 'Xenova/all-MiniLM-L6-v2'; // Dim: 384  | Fastest, poorest retrieval
+    static model = 'Xenova/bge-small-en-v1.5'; // Dim: 384 | Second fastest, better retrieval
+    // static model = 'Xenova/gte-base'; // Dim: 768 | Slowest, best retrieval
+
     static instance: HuggingFaceTransformersEmbeddings | null = null;
     static async getInstance() {
       if (this.instance === null) {
