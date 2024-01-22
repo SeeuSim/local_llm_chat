@@ -26,6 +26,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
 
+  // For excluding model binaries on RSC from webpack parser
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
   },
