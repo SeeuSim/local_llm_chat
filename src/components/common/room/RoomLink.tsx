@@ -1,10 +1,14 @@
 'use client';
 
 import { DotsVerticalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 
-import { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
+import type { IAPIChatRoomDeleteParams } from '@/app/api/chat/room/delete/types';
+import type { TAPIChatRoomUpdateParams } from '@/app/api/chat/room/update/types';
+
 import { buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,12 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
 import { chatRoomContext } from '@/lib/contexts/chatRoomContext';
 import { searchParamsRoomIdContext } from '@/lib/contexts/chatRoomSearchParamsContext';
 import { cn } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { IAPIChatRoomDeleteParams } from '@/app/api/chat/room/delete/types';
-import { useRouter } from 'next/navigation';
 
 interface IRoomLinkProps {
   id: string;
